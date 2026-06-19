@@ -1,0 +1,8 @@
+[package]
+name = "terminus"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+miniquad = "0.4.11"
+quad-rand = "0.2.3"
