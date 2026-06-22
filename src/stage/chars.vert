@@ -1,28 +1,41 @@
 #version 130
 in vec2 in_pos;
 in vec2 inst_pos;
-in int inst_data;
+in uint inst_dataq;
 
 out vec2 tex_coord;
-out vec4 fg_col;
-out vec4 bg_col;
+out vec3 fg_col;
+out vec3 bg_col;
 
-// if-- rrrg ggbb brrr gggb bbcc cccc cccc
+uniform mat4 mvp;
+uniform uint data;
+
+// rrrg ggbb brrr gggb bbcc cccc cif- ---- 
 
 void main() {
-    int fg_invert = ((inst_data >> 31) & 0b1) == 1;
-    int fg_flash  = ((inst_data >> 30) & 0b1) == 1;
-    int fg_r = (inst_data >> 25) & 0b111;
-    int fg_g = (inst_data >> 22) & 0b111;
-    int fg_b = (inst_data >> 19) & 0b111;
-    int fg_r = (inst_data >> 16) & 0b111;
-    int fg_g = (inst_data >> 13) & 0b111;
-    int fg_b = (inst_data >> 10) & 0b111;
-    int c = inst_data & 0b1111111111;
+    uint inst_data = 3766476800u; 
+    float fg_r = float((inst_data >> 29u) & 7u) / 7.0; //0b111
+    float fg_g = float((inst_data >> 26u) & 7u) / 7.0; //0b111
+    float fg_b = float((inst_data >> 23u) & 7u) / 7.0; //0b111
+    float bg_r = float((inst_data >> 20u) & 7u) / 7.0; //0b111
+    float bg_g = float((inst_data >> 17u) & 7u) / 7.0; //0b111
+    float bg_b = float((inst_data >> 14u) & 7u) / 7.0; //0b111
+    uint c = ((inst_data >> 7u) & 127u); //0b111 1111;
+    bool invert = ((inst_data >> 6u) & 1u) == 1u;
+    bool flash  = ((inst_data >> 5u) & 1u) == 1u;
 
-    // todo: fancy rgb colours
+    // todo: rgb colors ramped to force palette
     // TODO: Half-pixel offset
-    // texcoord
-    gl_Position = mvp * vec4(in_pos + inst_pos, 0.0, 1.0);
+    tex_coord = (vec2(float(c % 16u), 15.0-float(c / 16u)) + (in_pos / 8.0)) / 16.0;
+    
+    fg_col = vec3(fg_r * 0.81 + 0.19, fg_g * 0.9 + 0.1, fg_b * 0.88 + 0.12);
+    bg_col = vec3(bg_r * 0.81 + 0.19, bg_g * 0.9 + 0.1, bg_b * 0.88 + 0.12);
 
+    bool flashing = (data & 1u) == 1u;
+    if (invert ^^ (flashing && flash)) {
+        vec3 temp = vec3(fg_col);
+        fg_col = bg_col;
+        bg_col = temp;
+    }
+    gl_Position = mvp * vec4(in_pos + inst_pos, 0.0, 1.0);
 }
