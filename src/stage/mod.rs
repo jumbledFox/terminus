@@ -20,7 +20,7 @@ const CHARS_FRAG: &str = include_str!("chars.frag");
 #[repr(C)]
 struct Uniforms {
     mvp: Mat4,
-    data: u32,
+    // data: u32,
 }
 
 #[repr(C)]
@@ -101,7 +101,7 @@ impl Stage {
                 uniforms: UniformBlockLayout {
                     uniforms: vec![
                         UniformDesc::new("mvp",  UniformType::Mat4),
-                        UniformDesc::new("data", UniformType::Int1),
+                        // UniformDesc::new("data", UniformType::Int1),
                     ]
                 }
             }
@@ -117,8 +117,8 @@ impl Stage {
             ],
             &[
                 VertexAttribute::with_buffer("in_pos",    VertexFormat::Float2, 0),
+                VertexAttribute::with_buffer("inst_data", VertexFormat::Float1,   1),
                 VertexAttribute::with_buffer("inst_pos",  VertexFormat::Float2, 1),
-                VertexAttribute::with_buffer("inst_data", VertexFormat::Int1, 1),
             ],
             shader,
             PipelineParams::default(),
@@ -169,7 +169,7 @@ impl EventHandler for Stage {
 
         self.ctx.apply_pipeline(&self.pipeline);
         self.ctx.apply_bindings(&self.bindings);
-        self.ctx.apply_uniforms(UniformsSource::table(&Uniforms { mvp, data }));
+        self.ctx.apply_uniforms(UniformsSource::table(&Uniforms { mvp, /*data*/ }));
 
         self.ctx.draw(0, 6, self.screen.instance_data().len() as i32);
 

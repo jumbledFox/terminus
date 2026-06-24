@@ -8,8 +8,8 @@ use crate::stage::{COLUMNS, ROWS};
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
 pub struct InstanceData {
+    data: f32,
     pos: Vec2,
-    data: u32,
 }
 
 pub struct Screen {
@@ -24,7 +24,7 @@ impl Screen {
                 i = i.wrapping_add(1);
                 InstanceData {
                     pos: vec2((i % COLUMNS) as f32, (i / COLUMNS) as f32) * 8.0,
-                    data: gen_range(0, u32::MAX),
+                    data: gen_range(0.0, f32::MAX),
                 }
             })
             .collect::<Vec<InstanceData>>()
@@ -57,10 +57,16 @@ impl Screen {
             //  + ((g & 7) << 17)
             //  + ((b & 7) << 14)
             //  + (0b1 << 6) * if (x+y) % 2 == 0 { 0 } else { 1 };
-            self.instance_data[i].data = 0b111_000_000__111_111_111_1000000_0_0_00000u32.to_be();
-            
-            println!("{:#034b}", self.instance_data[i].data);
+            // self.instance_data[i].data = 0b111_000_000__111_111_111_1000000_0_0_00000u32.to_be();
+            // self.instance_data[i].data = 0b11111111_11111101u32;
+            self.instance_data[i].data = 2.0;
+            println!("{:?}", self.instance_data[i].data);
+            // println!("{:#034b}", self.instance_data[i].data);
         }
+
+        println!("InstanceData size = {}", std::mem::size_of::<InstanceData>());
+        println!("InstanceData align = {}", std::mem::align_of::<InstanceData>());
+        println!("Vec2 size = {}", std::mem::size_of::<Vec2>());
     }
 
     pub fn instance_data(&self) -> &[InstanceData; COLUMNS*ROWS] {
