@@ -69,7 +69,6 @@ impl Screen {
             // let character = 128;
             
             let step = x / (COLUMNS / 6);
-            println!("{:?}", step);
             let a = (y / (ROWS / 8)) as f32;
             // println!("{:?}", a);
             let r = if matches!(step, 0|1|5) { a } else { 0.0 };
@@ -94,14 +93,10 @@ impl Screen {
             //     println!("diff: {prev} -> {next}");
             // }
             self.instance_data[i].set_bg(r * 100.0 + g * 10.0 + b);
-            self.instance_data[i].set_fg(0.0);
+            self.instance_data[i].set_fg(b * 100.0 + r * 10.0 + g);
 
             // println!("{:#034b}", self.instance_data[i].data);
         }
-
-        // println!("InstanceData size = {}", std::mem::size_of::<InstanceData>());
-        // println!("InstanceData align = {}", std::mem::align_of::<InstanceData>());
-        // println!("Vec2 size = {}", std::mem::size_of::<Vec2>());
     }
 
     pub fn instance_data(&self) -> &[InstanceData; COLUMNS*ROWS] {
