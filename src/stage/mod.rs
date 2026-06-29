@@ -2,7 +2,7 @@ use std::io::Cursor;
 
 use glam::{Mat4, Vec2, Vec3, vec2, vec3};
 use image::ImageReader;
-use miniquad::{Bindings, BufferLayout, BufferSource, BufferType, BufferUsage, EventHandler, FilterMode, MipmapFilterMode, Pipeline, PipelineParams, RenderingBackend, ShaderMeta, ShaderSource, UniformBlockLayout, UniformDesc, UniformType, UniformsSource, VertexAttribute, VertexFormat, VertexStep, window};
+use miniquad::{Bindings, BufferLayout, BufferSource, BufferType, BufferUsage, EventHandler, FilterMode, KeyCode::T, MipmapFilterMode, Pipeline, PipelineParams, RenderingBackend, ShaderMeta, ShaderSource, TextureId, UniformBlockLayout, UniformDesc, UniformType, UniformsSource, VertexAttribute, VertexFormat, VertexStep, window};
 use quad_rand::gen_range;
 
 use crate::stage::screen::Screen;
@@ -14,6 +14,7 @@ pub const COLUMNS: usize = 80;
 pub const ROWS:    usize = 42;
 
 const CHARS_TEXTURE: &[u8] = include_bytes!("../../res/chars.png");
+const PAL_TEXTURE: &[u8]   = include_bytes!("../../res/pal.png");
 const CHARS_VERT: &str = include_str!("chars.vert");
 const CHARS_FRAG: &str = include_str!("chars.frag");
 
@@ -73,22 +74,29 @@ impl Stage {
             BufferSource::slice(&indices),
         );
 
-        // load the texture atlas
-        let chars_texture = ImageReader::new(Cursor::new(CHARS_TEXTURE))
-            .with_guessed_format().expect("failed to decode char atlas!")
-            .decode().expect("failed to decode char atlas!")
-            .flipv();
-        let texture = ctx.new_texture_from_rgba8(
-            chars_texture.width()  as u16,
-            chars_texture.height() as u16,
-            chars_texture.as_bytes()
-        );
-        ctx.texture_set_filter(texture, FilterMode::Nearest, MipmapFilterMode::None);
+        // Load the character atlas and palette
+        let mut load_texture = |bytes: &[u8], flip_v: bool| -> TextureId {
+            let mut t = ImageReader::new(Cursor::new(bytes))
+                .with_guessed_format().expect("failed to decode char atlas!")
+                .decode().expect("failed to decode char atlas!");
+            if flip_v {
+                t = t.flipv()
+            }
+            let texture = ctx.new_texture_from_rgba8(
+                t.width()  as u16,
+                t.height() as u16,
+                t.as_bytes()
+            );
+            ctx.texture_set_filter(texture, FilterMode::Nearest, MipmapFilterMode::None);
+            texture
+        };
+        let chars = load_texture(CHARS_TEXTURE, true);
+        let pal = load_texture(PAL_TEXTURE, false);
 
         let bindings = Bindings {
             vertex_buffers: vec![geometry_vertex_buffer, instance_vertex_buffer],
             index_buffer,
-            images: vec![texture],
+            images: vec![chars, pal],
         };
 
         let shader = ctx.new_shader(
@@ -97,7 +105,10 @@ impl Stage {
                 fragment: CHARS_FRAG
             },
             ShaderMeta {
-                images: vec!["tex".to_string()],
+                images: vec![
+                    "atlas".to_string(),
+                    "pal".to_string(),
+                ],
                 uniforms: UniformBlockLayout {
                     uniforms: vec![
                         UniformDesc::new("mvp",  UniformType::Mat4),
@@ -116,9 +127,11 @@ impl Stage {
                 },
             ],
             &[
-                VertexAttribute::with_buffer("in_pos",    VertexFormat::Float2, 0),
-                VertexAttribute::with_buffer("inst_data", VertexFormat::Float1,   1),
-                VertexAttribute::with_buffer("inst_pos",  VertexFormat::Float2, 1),
+                VertexAttribute::with_buffer("in_pos",     VertexFormat::Float2, 0),
+                VertexAttribute::with_buffer("inst_pos",   VertexFormat::Float2, 1),
+                VertexAttribute::with_buffer("inst_fg",    VertexFormat::Float1, 1),
+                VertexAttribute::with_buffer("inst_bg",    VertexFormat::Float1, 1),
+                VertexAttribute::with_buffer("inst_char",  VertexFormat::Float1, 1),
             ],
             shader,
             PipelineParams::default(),

@@ -1,6 +1,7 @@
 use std::{ops::AddAssign, u32};
 
 use glam::{Vec2, vec2};
+use miniquad::KeyCode::S;
 use quad_rand::gen_range;
 
 use crate::stage::{COLUMNS, ROWS};
@@ -8,8 +9,34 @@ use crate::stage::{COLUMNS, ROWS};
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
 pub struct InstanceData {
-    data: f32,
     pos: Vec2,
+    fg: f32,
+    bg: f32,
+    character: f32,
+}
+
+impl InstanceData {
+    pub fn new(i: usize) -> Self {
+        Self {
+            pos: vec2((i % COLUMNS) as f32, (i / COLUMNS) as f32) * 8.0,
+            fg: gen_range(000, 999) as f32,
+            bg: gen_range(000, 999) as f32,
+            character: gen_range(0.0, 128.0)
+        }
+    }
+
+    pub fn set_fg(&mut self, col: f32) {
+        self.fg = col.clamp(0.0, 999.0).trunc();
+    }
+
+    pub fn set_bg(&mut self, col: f32) {
+        self.bg = col.clamp(0.0, 999.0).trunc();
+    }
+
+    pub fn set_character(&mut self, c: f32) {
+        self.character = c + self.character.fract();
+    }
+    // TODO: flashing and inverted
 }
 
 pub struct Screen {
@@ -22,10 +49,7 @@ impl Screen {
         let instance_data = (0..COLUMNS*ROWS)
             .map(|_| {
                 i = i.wrapping_add(1);
-                InstanceData {
-                    pos: vec2((i % COLUMNS) as f32, (i / COLUMNS) as f32) * 8.0,
-                    data: gen_range(0.0, f32::MAX),
-                }
+                InstanceData::new(i)
             })
             .collect::<Vec<InstanceData>>()
             .try_into()
@@ -46,11 +70,11 @@ impl Screen {
             
             let step = x / (COLUMNS / 6);
             println!("{:?}", step);
-            let a = (y / (ROWS / 8)) as u32;
-            let a = 7;
-            let r = if matches!(step, 0) { a } else { 0 };
-            let g = if matches!(step, 1) { a } else { 0 };
-            let b = if matches!(step, 2) { a } else { 0 };
+            let a = (y / (ROWS / 8)) as f32;
+            // println!("{:?}", a);
+            let r = if matches!(step, 0|1|5) { a } else { 0.0 };
+            let g = if matches!(step, 1|2|3) { a } else { 0.0 };
+            let b = if matches!(step, 3|4|5) { a } else { 0.0 };
 
             // self.instance_data[i].data = 0
             //  + ((r & 7) << 20)
@@ -59,14 +83,25 @@ impl Screen {
             //  + (0b1 << 6) * if (x+y) % 2 == 0 { 0 } else { 1 };
             // self.instance_data[i].data = 0b111_000_000__111_111_111_1000000_0_0_00000u32.to_be();
             // self.instance_data[i].data = 0b11111111_11111101u32;
-            self.instance_data[i].data = 2.0;
-            println!("{:?}", self.instance_data[i].data);
+            // self.instance_data[i].data = 0b110;
+            // println!("{:?}", self.instance_data[i].data);
+
+            // self.instance_data[i].set_fg(000.0);
+            // self.instance_data[i].set_bg(090.0);
+            // self.instance_data[i].set_bg_color(100.0);
+
+            // if next != prev {
+            //     println!("diff: {prev} -> {next}");
+            // }
+            self.instance_data[i].set_bg(r * 100.0 + g * 10.0 + b);
+            self.instance_data[i].set_fg(0.0);
+
             // println!("{:#034b}", self.instance_data[i].data);
         }
 
-        println!("InstanceData size = {}", std::mem::size_of::<InstanceData>());
-        println!("InstanceData align = {}", std::mem::align_of::<InstanceData>());
-        println!("Vec2 size = {}", std::mem::size_of::<Vec2>());
+        // println!("InstanceData size = {}", std::mem::size_of::<InstanceData>());
+        // println!("InstanceData align = {}", std::mem::align_of::<InstanceData>());
+        // println!("Vec2 size = {}", std::mem::size_of::<Vec2>());
     }
 
     pub fn instance_data(&self) -> &[InstanceData; COLUMNS*ROWS] {
