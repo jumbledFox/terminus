@@ -94,6 +94,7 @@ impl Screen {
             // }
             self.instance_data[i].set_bg(r * 100.0 + g * 10.0 + b);
             self.instance_data[i].set_fg(b * 100.0 + r * 10.0 + g);
+            self.instance_data[i].set_character((((x % 16) + 16 - (y % 8) * 16) % 128) as f32);
 
             // println!("{:#034b}", self.instance_data[i].data);
         }
