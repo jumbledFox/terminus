@@ -1,4 +1,4 @@
-use std::io::Cursor;
+use std::{f32::consts::PI, io::Cursor};
 
 use glam::{Mat4, Vec2, Vec3, vec2, vec3};
 use image::ImageReader;
@@ -37,6 +37,7 @@ pub struct Stage {
     // screen and input
     screen: Screen,
 
+    t: f32,
     // program
 }
 
@@ -140,13 +141,39 @@ impl Stage {
         Self { 
             ctx, pipeline, bindings,
             screen,
+            t: 0.0,
         }
     }
 }
 
 impl EventHandler for Stage {
     fn update(&mut self) {
-        
+        self.t = (self.t + 0.1).rem_euclid(PI * 2.0);
+        for y in 0..ROWS {
+            for x in 0..COLUMNS {
+                let mut c = if (x + y) % 2 == 0 { 63.0 } else { 0.0 };
+                let t_p = self.t / (PI * 2.0);
+                let x_p = x as f32 / COLUMNS as f32;
+                if x_p > t_p - 0.1 && x_p < t_p + 0.1 {
+                    c = 64.0;
+                }
+
+                self.screen.char_xy(x, y).set_character(c, None, None);
+                self.screen.char_xy(x, y).set_color_rgb(
+                    Some(vec3(9.0, 9.0, 9.0)),
+                    Some(vec3(
+                        (x as f32 / COLUMNS as f32) * 9.0,
+                        (y as f32 / ROWS    as f32) * 9.0 * (self.t.cos() / 2.0 + 0.5),
+                        (x as f32 / COLUMNS as f32) * 9.0 * (self.t.sin() / 2.0 + 0.5),
+                    ))
+                );
+            }
+        }
+
+        for i in 0..26 {
+            self.screen.char_xy(i+4, 12).set_character(64.0 + i as f32, None, None);
+            self.screen.char_xy(i+4, 12).set_color_splash(Some(999.0), Some(900.0));
+        }
     }
 
     fn draw(&mut self) {

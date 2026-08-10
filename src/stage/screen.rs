@@ -1,6 +1,6 @@
 use std::{ops::AddAssign, u32};
 
-use glam::{Vec2, vec2};
+use glam::{Vec2, Vec3, vec2, vec3};
 use miniquad::KeyCode::S;
 use quad_rand::gen_range;
 
@@ -25,15 +25,27 @@ impl InstanceData {
         }
     }
 
-    pub fn set_fg(&mut self, col: f32) {
-        self.fg = col.clamp(0.0, 999.0).trunc();
+    pub fn set_color_splash(&mut self, fg: Option<f32>, bg: Option<f32>) {
+        if let Some(fg) = fg {
+            self.fg = fg.clamp(0.0, 999.0).trunc();
+        }
+        if let Some(bg) = bg {
+            self.bg = bg.clamp(0.0, 999.0).trunc();
+        }
+    }
+    pub fn set_color_rgb(&mut self, fg: Option<Vec3>, bg: Option<Vec3>) {
+        let n = |i: f32| -> f32 {
+            i.floor().clamp(0.0, 9.0)
+        };
+        if let Some(c) = fg {
+            self.fg = n(c.x) * 100.0 + n(c.y) * 10.0 + n(c.z);
+        }
+        if let Some(c) = bg {
+            self.bg = n(c.x) * 100.0 + n(c.y) * 10.0 + n(c.z);
+        }
     }
 
-    pub fn set_bg(&mut self, col: f32) {
-        self.bg = col.clamp(0.0, 999.0).trunc();
-    }
-
-    pub fn set_character(&mut self, c: f32) {
+    pub fn set_character(&mut self, c: f32, flashing: Option<bool>, inverted: Option<bool>) {
         self.character = c + self.character.fract();
     }
     // TODO: flashing and inverted
@@ -46,6 +58,7 @@ pub struct Screen {
 impl Screen {
     pub fn new() -> Self {
         let mut i = usize::MAX;
+        // initialise the screen with garbage values (because its coooool :3)
         let instance_data = (0..COLUMNS*ROWS)
             .map(|_| {
                 i = i.wrapping_add(1);
@@ -54,9 +67,15 @@ impl Screen {
             .collect::<Vec<InstanceData>>()
             .try_into()
             .expect("uh oh, failed to assemble screen. this should never happen unless ive been reaaaally silly...");
-        let mut s = Self { instance_data };
-        s.test_texture();
-        s
+        Self { instance_data }
+    }
+
+    pub fn char_xy(&mut self, x: usize, y: usize) -> &mut InstanceData {
+        &mut self.instance_data[x + y * COLUMNS]
+    }
+
+    pub fn set_character_xy(&mut self, x: usize, y: usize, fg: Option<Vec3>, bg: Option<Vec3>, ) {
+        // self.instance_data[x + y * COLUMNS]
     }
 
     pub fn test_texture(&mut self) {
@@ -69,11 +88,15 @@ impl Screen {
             // let character = 128;
             
             let step = x / (COLUMNS / 6);
-            let a = (y / (ROWS / 8)) as f32;
+            let a = ((y / (ROWS / 10)) as f32).min(9.0);
             // println!("{:?}", a);
             let r = if matches!(step, 0|1|5) { a } else { 0.0 };
             let g = if matches!(step, 1|2|3) { a } else { 0.0 };
             let b = if matches!(step, 3|4|5) { a } else { 0.0 };
+            let col = vec3(r, g, b);
+
+            self.instance_data[i].set_color_rgb(Some(col), Some(9.0 - col));
+            self.instance_data[i].set_character((((x % 16) + 16 - (y % 8) * 16) % 128) as f32, None, None);
 
             // self.instance_data[i].data = 0
             //  + ((r & 7) << 20)
@@ -92,9 +115,9 @@ impl Screen {
             // if next != prev {
             //     println!("diff: {prev} -> {next}");
             // }
-            self.instance_data[i].set_bg(r * 100.0 + g * 10.0 + b);
-            self.instance_data[i].set_fg(b * 100.0 + r * 10.0 + g);
-            self.instance_data[i].set_character((((x % 16) + 16 - (y % 8) * 16) % 128) as f32);
+            // self.instance_data[i].set_bg(r * 100.0 + g * 10.0 + b);
+            // self.instance_data[i].set_fg(b * 100.0 + r * 10.0 + g);
+            // self.instance_data[i].set_character((((x % 16) + 16 - (y % 8) * 16) % 128) as f32);
 
             // println!("{:#034b}", self.instance_data[i].data);
         }
