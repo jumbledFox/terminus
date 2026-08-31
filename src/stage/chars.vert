@@ -15,11 +15,20 @@ out vec2 bg_col;
 uniform mat4 mvp;
 
 void main() {
-    // TODO: Half-pixel offset
     // todo: mod
-    tex_coord = (vec2(float(int(inst_char) % 16), 15.0 - float(int(inst_char) / 16)) + (in_pos / 8.0)) / 16.0;
-    fg_col = (vec2(mod(inst_fg, 100.0), trunc(inst_fg / 100.0)) + 0.5) / vec2(100.0, 10.0);
-    bg_col = (vec2(mod(inst_bg, 100.0), trunc(inst_bg / 100.0)) + 0.5) / vec2(100.0, 10.0);
+    vec2 half_pix = -((in_pos / 8.0) - 0.5) / 128.0;
+    tex_coord = (vec2(float(int(inst_char) % 16), 15.0 - float(int(inst_char) / 16)) + (in_pos / 8.0)) / 16.0 + half_pix;
+
+    vec2 fg = (vec2(mod(inst_fg, 100.0), trunc(inst_fg / 100.0)) + 0.5) / vec2(100.0, 10.0);
+    vec2 bg = (vec2(mod(inst_bg, 100.0), trunc(inst_bg / 100.0)) + 0.5) / vec2(100.0, 10.0);
+
+    if (true) {
+        fg_col = fg;
+        bg_col = bg;
+    } else {
+        fg_col = bg;
+        bg_col = fg;
+    }
 
     gl_Position = mvp * vec4(in_pos + inst_pos, 0.0, 1.0);
 }

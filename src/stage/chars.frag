@@ -9,10 +9,9 @@ uniform sampler2D pal;
 
 void main() {
     vec4 col = texture2D(atlas, tex_coord);
-    if (col.x == 1.0) {
-        gl_FragColor = texture2D(pal, fg_col);
-    } else {
+    if (col.x == 0.0) {
         gl_FragColor = texture2D(pal, bg_col);
+    } else {
+        gl_FragColor = texture2D(pal, fg_col);
     }
-    // gl_FragColor = col;
 }
