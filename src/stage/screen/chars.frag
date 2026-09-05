@@ -24,8 +24,8 @@ void main() {
     vec2 glyph_offset = vec2(mod(character, 16.0), 15.0 - floor(character / 16.0));
     vec4 glyph = texture2D(atlas, (cell_local + glyph_offset) / 16.0);
     
-    vec2 fg_uv = (vec2(mod(fg_i, 16.0), floor(fg_i / 16.0)) + 0.5) / 16.0;
-    vec2 bg_uv = (vec2(mod(bg_i, 16.0), floor(bg_i / 16.0)) + 0.5) / 16.0;
+    vec2 fg_uv = (vec2(mod(fg_i, 32.0), floor(fg_i / 32.0)) + 0.5) / vec2(32.0, 8.0);
+    vec2 bg_uv = (vec2(mod(bg_i, 32.0), floor(bg_i / 32.0)) + 0.5) / vec2(32.0, 8.0);
 
     vec4 fg = texture2D(pal, fg_uv);
     vec4 bg = texture2D(pal, bg_uv);

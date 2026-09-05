@@ -35,35 +35,35 @@ impl Screen {
         }
 
         for i in 0..26 {
-            cells[i] = Cell { ch: 64 + i as u8, fg: 4, bg: 7*16, attrib: 0 }
+            cells[i] = Cell { ch: 64 + i as u8, fg: 225, bg: 255, attrib: 0 }
         }
 
         for x in 0..20 {
             for y in 1..10 {
-                cells[x+y*U_COLUMNS] = Cell { ch: 0, fg: 0, bg: 255, attrib: 0 };
+                cells[x+y*U_COLUMNS] = Cell { ch: 0, fg: 0, bg: 0, attrib: 0 };
             }
         }
 
-        cells[1+2*U_COLUMNS] = Cell { ch: 36, fg: 80, bg: 255, attrib: 0 };
-        cells[1+3*U_COLUMNS] = Cell { ch: 41, fg: 80, bg: 255, attrib: 0 };
-        cells[2+3*U_COLUMNS] = Cell { ch: 34, fg: 80, bg: 255, attrib: 0 };
+        cells[1+2*U_COLUMNS] = Cell { ch: 36, fg: 229, bg: 0, attrib: 0 };
+        cells[1+3*U_COLUMNS] = Cell { ch: 41, fg: 229, bg: 0, attrib: 0 };
+        cells[2+3*U_COLUMNS] = Cell { ch: 34, fg: 229, bg: 0, attrib: 0 };
 
-        cells[3+2*U_COLUMNS] = Cell { ch: 3,  fg: 255, bg: 88, attrib: 0 };
-        cells[3+3*U_COLUMNS] = Cell { ch: 33, fg: 138, bg: 88, attrib: 0 };
-        cells[3+4*U_COLUMNS] = Cell { ch: 34, fg: 138, bg: 255, attrib: 0 };
+        cells[3+2*U_COLUMNS] = Cell { ch: 3,  fg: 0, bg: 61, attrib: 0 };
+        cells[3+3*U_COLUMNS] = Cell { ch: 33, fg: 49, bg: 61, attrib: 0 };
+        cells[3+4*U_COLUMNS] = Cell { ch: 34, fg: 49, bg: 0, attrib: 0 };
 
-        cells[4+2*U_COLUMNS] = Cell { ch: 34, fg: 255, bg: 88, attrib: 0 };
-        cells[4+3*U_COLUMNS] = Cell { ch: 0,  fg: 0,   bg: 88, attrib: 0 };
-        cells[4+4*U_COLUMNS] = Cell { ch: 43, fg: 255, bg: 88, attrib: 0 };
+        cells[4+2*U_COLUMNS] = Cell { ch: 34, fg: 0, bg: 61, attrib: 0 };
+        cells[4+3*U_COLUMNS] = Cell { ch: 0,  fg: 0,   bg: 61, attrib: 0 };
+        cells[4+4*U_COLUMNS] = Cell { ch: 43, fg: 0, bg: 61, attrib: 0 };
 
-        cells[5+2*U_COLUMNS] = Cell { ch: 95, fg: 255, bg: 88, attrib: 0 };
-        cells[5+3*U_COLUMNS] = Cell { ch: 95, fg: 255, bg: 88, attrib: 0 };
-        cells[5+4*U_COLUMNS] = Cell { ch: 21, fg: 88, bg: 138, attrib: 0 };
+        cells[5+2*U_COLUMNS] = Cell { ch: 95, fg: 0, bg: 61, attrib: 0 };
+        cells[5+3*U_COLUMNS] = Cell { ch: 95, fg: 0, bg: 61, attrib: 0 };
+        cells[5+4*U_COLUMNS] = Cell { ch: 21, fg: 61, bg: 49, attrib: 0 };
 
         for i in 0..7 {
-            cells[6+i+2*U_COLUMNS] = Cell { ch: 3, fg: 255, bg: 88, attrib: 0 };
-            cells[6+i+3*U_COLUMNS] = Cell { ch: 0, fg: 0, bg: 88, attrib: 0 };
-            cells[6+i+4*U_COLUMNS] = Cell { ch: 3, fg: 138, bg: 255, attrib: 0 };
+            cells[6+i+2*U_COLUMNS] = Cell { ch: 3, fg: 0, bg: 61, attrib: 0 };
+            cells[6+i+3*U_COLUMNS] = Cell { ch: 0, fg: 0, bg: 61, attrib: 0 };
+            cells[6+i+4*U_COLUMNS] = Cell { ch: 3, fg: 49, bg: 0, attrib: 0 };
         }
 
 
