@@ -34,7 +34,6 @@ impl ScreenMesh {
         let (col, row) = (
             COLUMNS as f32 * 8.0, ROWS as f32 * 8.0
         );
-        // let (col, row) = (8.0, 8.0);
         let vertices: &[Vertex] = &[
             Vertex { in_pos: vec2( 0.0, 0.0) },
             Vertex { in_pos: vec2( 0.0, row) },
@@ -101,9 +100,9 @@ impl ScreenMesh {
             },
             ShaderMeta {
                 images: vec![
+                    "cells".to_string(),
                     "atlas".to_string(),
                     "pal".to_string(),
-                    "cells".to_string(),
                 ],
                 uniforms: UniformBlockLayout {
                     uniforms: vec![
