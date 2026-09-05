@@ -38,9 +38,9 @@ impl Screen {
             mesh: ScreenMesh::new(ctx),
             cells,
         };
-        // for i in 0..=26 {
-        //     screen.cells[i] = Cell { ch: 64 + i as u8, fg: 2, bg: 3, attrib: 0 }
-        // }
+        for i in 0..26 {
+            screen.cells[i] = Cell { ch: 64 + i as u8, fg: 4, bg: 7*16, attrib: 0 }
+        }
         screen.update_mesh(ctx);
         screen
     }

@@ -11,7 +11,7 @@ void main() {
 
     vec2 cell_pos = floor(uv / 8.0) / term_size;
 
-    vec2 cell_uv = (floor(cell_pos) + 0.5) / term_size;
+    vec2 cell_uv = cell_pos + 0.5 / term_size;
     vec4 data = texture2D(cells, cell_uv);
 
     float character  = (data.r * 255.0); 
@@ -31,9 +31,4 @@ void main() {
     vec4 bg = texture2D(pal, bg_uv);
 
     gl_FragColor = mix(bg, fg, glyph);
-
-
-    // vec4 c1 = vec4(cell_local.x, cell_local.y, data.g, 1.0);
-    // vec4 c2 = vec4(cell_pos.x, cell_pos.y, data.g, 1.0);
-    // gl_FragColor = glyph;
 }
