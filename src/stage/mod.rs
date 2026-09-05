@@ -5,7 +5,7 @@ use image::ImageReader;
 use miniquad::{Bindings, BufferLayout, BufferSource, BufferType, BufferUsage, EventHandler, FilterMode, KeyCode::T, MipmapFilterMode, Pipeline, PipelineParams, RenderingBackend, ShaderMeta, ShaderSource, TextureId, UniformBlockLayout, UniformDesc, UniformType, UniformsSource, VertexAttribute, VertexFormat, VertexStep, window};
 use quad_rand::gen_range;
 
-use crate::stage::screen::Screen;
+use crate::stage::{input::Input, screen::Screen};
 
 pub mod input;
 pub mod screen;
@@ -17,12 +17,10 @@ pub const U_ROWS:    usize = ROWS    as usize;
 
 pub type Ctx = Box<dyn RenderingBackend>;
 
-
-
 pub struct Stage {
     ctx: Box<dyn RenderingBackend>,
     screen: Screen,
-    // input
+    input: Input,
     // program
 }
 
@@ -30,8 +28,12 @@ impl Stage {
     pub fn new() -> Self {
         let mut ctx: Box<dyn RenderingBackend> = window::new_rendering_backend();
         let screen = Screen::new(&mut ctx);
-
-        Self { ctx, screen }
+        let input = Input::new();
+        Self {
+            ctx,
+            screen,
+            input,
+        }
     }
 }
 
