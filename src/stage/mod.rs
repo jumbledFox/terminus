@@ -11,7 +11,7 @@ pub mod input;
 pub mod screen;
 
 pub const COLUMNS: u8 = 80+40;
-pub const ROWS:    u8 = 42+21;
+pub const ROWS:    u8 = 48+24;
 pub const U_COLUMNS: usize = COLUMNS as usize;
 pub const U_ROWS:    usize = ROWS    as usize;
 

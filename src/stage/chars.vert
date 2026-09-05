@@ -13,6 +13,7 @@ out vec2 bg_col;
 
 // uniform uint data;
 uniform mat4 mvp;
+uniform sampler2D screen;
 
 void main() {
     // todo: mod
@@ -22,6 +23,7 @@ void main() {
     vec2 fg = (vec2(mod(inst_fg, 100.0), trunc(inst_fg / 100.0)) + 0.5) / vec2(100.0, 10.0);
     vec2 bg = (vec2(mod(inst_bg, 100.0), trunc(inst_bg / 100.0)) + 0.5) / vec2(100.0, 10.0);
 
+    // TODO: Inverting and flashing
     if (true) {
         fg_col = fg;
         bg_col = bg;
