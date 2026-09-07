@@ -2,7 +2,7 @@ use std::io::Cursor;
 
 use glam::{Mat4, Vec2, Vec3, vec2, vec3};
 use image::ImageReader;
-use miniquad::{Bindings, BufferLayout, BufferSource, BufferType, BufferUsage, FilterMode, MipmapFilterMode, Pipeline, PipelineParams, ShaderMeta, ShaderSource, TextureFormat, TextureId, TextureKind, TextureParams, TextureWrap, UniformBlockLayout, UniformDesc, UniformType, UniformsSource, VertexAttribute, VertexFormat};
+use miniquad::{Bindings, BufferLayout, BufferSource, BufferType, BufferUsage, FilterMode, MipmapFilterMode, Pipeline, PipelineParams, ShaderMeta, ShaderSource, TextureFormat, TextureId, TextureKind, TextureParams, TextureWrap, UniformBlockLayout, UniformDesc, UniformType, UniformsSource, VertexAttribute, VertexFormat, window::screen_size};
 
 use crate::stage::{COLUMNS, Ctx, ROWS, U_COLUMNS, U_ROWS, screen::Cell};
 
@@ -129,14 +129,37 @@ impl ScreenMesh {
     }
 
     pub fn draw(&self, ctx: &mut Ctx) {
-        // todo: no stretch, pixel perfect modes
+        // TODO: Move this to screen,
+
+        // the screen is the actual monitor, the view is the terminal display
+        let (sw, sh) = screen_size();
+        let (vw, vh) = (COLUMNS as f32 * 8.0, ROWS as f32 * 8.0);
+
+        // derived from notes in my silly notebook,,,
+        let (l, r, b, t) = match vw/vh < sw/sh {
+            // if the screen is wider than the view
+            true  => {
+                let x = ((sw/sh)*vh - vw) / 2.0;
+                (-x, vw+x, 0.0, vh)
+            },
+            // if the screen is taller than the view
+            false => {
+                let y = ((sh/sw)*vw - vh) / 2.0;
+                (0.0, vw, -y, vh+y)
+            },
+        };
         let proj = Mat4::orthographic_rh_gl(
-            0.0, 
-            COLUMNS as f32 * 8.0, 
-            0.0, 
-            ROWS as f32 * 8.0,
+            l, r, b, t,
             0.001, 100.0,
         );
+        // todo: no stretch, pixel perfect modes
+        // let proj = Mat4::orthographic_rh_gl(
+        //     -10.0, 
+        //     COLUMNS as f32 * 8.0, 
+        //     -10.0, 
+        //     ROWS as f32 * 8.0,
+        //     0.001, 100.0,
+        // );
         let view = Mat4::look_at_rh(
             vec3(0.0, 0.0, 1.0),
             vec3(0.0, 0.0, 0.0),

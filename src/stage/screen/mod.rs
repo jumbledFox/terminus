@@ -10,6 +10,15 @@ use crate::stage::{COLUMNS, Ctx, ROWS, U_COLUMNS, U_ROWS, screen::mesh::ScreenMe
 
 mod mesh;
 
+enum ViewMode {
+    Stretch,
+    Fit,
+    PixelPerfect,
+}
+
+const A_INVERT: u8 = 0b0000_0001;
+const A_FLASH:  u8 = 0b0000_0010;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, bytemuck::Pod, bytemuck::Zeroable)]
 #[repr(C)]
 pub struct Cell {
@@ -17,6 +26,12 @@ pub struct Cell {
     fg: u8,
     bg: u8,
     attrib: u8
+}
+
+impl Cell {
+    pub fn new(ch: u8, fg: u8, bg: u8, attrib: u8) -> Self {
+        Self { ch, fg, bg, attrib }
+    }
 }
 
 pub struct Screen {
@@ -34,15 +49,46 @@ impl Screen {
             c.bg = gen_range(0, 255);
         }
 
+        for y in 0..U_ROWS {
+            for x in 0..U_COLUMNS {
+                let r = ((x * 8 * 2) / U_COLUMNS) % 8;
+                let g = ((y * 8 * 2) / U_ROWS)    % 8;
+                let b = if x >= U_COLUMNS/2 { 1 } else { 0 } + if y >= U_ROWS/2 { 2 } else { 0 };
+
+                let fg = ((r << 5) + (g << 2) + b) as u8;
+
+                let ch = match gen_range(0, 5) {
+                    0 => 63,
+                    1 => 95,
+                    2 => 111,
+                    _ => 0
+                };
+
+                // let ch = match gen_range(0, 4) {
+                //     0 => 63,
+                //     1 => 46,
+                //     2 => 62,
+                //     _ => 0
+                // };
+
+                cells[x+y*U_COLUMNS] = Cell::new(ch, fg, 0, 0);
+            }
+        }
+
+        for s in 0..4 {
+            
+        }
+
+
         for i in 0..26 {
             cells[i] = Cell { ch: 64 + i as u8, fg: 225, bg: 255, attrib: 0 }
         }
 
-        for x in 0..20 {
-            for y in 1..10 {
-                cells[x+y*U_COLUMNS] = Cell { ch: 0, fg: 0, bg: 0, attrib: 0 };
-            }
-        }
+        // for x in 0..20 {
+        //     for y in 1..10 {
+        //         cells[x+y*U_COLUMNS] = Cell::new(0, 0, 0, 0);
+        //     }
+        // }
 
         cells[1+2*U_COLUMNS] = Cell { ch: 36, fg: 229, bg: 0, attrib: 0 };
         cells[1+3*U_COLUMNS] = Cell { ch: 41, fg: 229, bg: 0, attrib: 0 };
@@ -78,7 +124,7 @@ impl Screen {
 
     pub fn update_mesh(&mut self, ctx: &mut Ctx) {
         self.mesh.update_texture(ctx, bytemuck::cast_slice(&self.cells[..]));
-        // self.mesh.update_texture(ctx, &[255; 4*U_COLUMNS*U_ROWS]);
+        // self.mesh.update_texture(ctx, &[0b111_000_11; 4*U_COLUMNS*U_ROWS]);
     }
 
     pub fn draw(&mut self, ctx: &mut Ctx) {

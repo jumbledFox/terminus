@@ -2,7 +2,7 @@ use std::{f32::consts::PI, io::Cursor, println};
 
 use glam::{Mat4, Vec2, Vec3, vec2, vec3};
 use image::ImageReader;
-use miniquad::{Bindings, BufferLayout, BufferSource, BufferType, BufferUsage, EventHandler, FilterMode, KeyCode::T, MipmapFilterMode, Pipeline, PipelineParams, RenderingBackend, ShaderMeta, ShaderSource, TextureId, UniformBlockLayout, UniformDesc, UniformType, UniformsSource, VertexAttribute, VertexFormat, VertexStep, window};
+use miniquad::{Bindings, BufferLayout, BufferSource, BufferType, BufferUsage, EventHandler, FilterMode, KeyCode::T, MipmapFilterMode, Pipeline, PipelineParams, RenderingBackend, ShaderMeta, ShaderSource, TextureId, UniformBlockLayout, UniformDesc, UniformType, UniformsSource, VertexAttribute, VertexFormat, VertexStep, window::{self, screen_size}};
 use quad_rand::gen_range;
 
 use crate::stage::{input::Input, screen::Screen};
@@ -43,6 +43,15 @@ impl EventHandler for Stage {
         //     self.screen.char_xy(i+4, 12).set_character(64.0 + i as f32, None, None);
         //     self.screen.char_xy(i+4, 12).set_color_splash(Some(999.0), Some(900.0));
         // }
+    }
+
+    fn char_event(&mut self, _character: char, _keymods: miniquad::KeyMods, _repeat: bool) {
+        println!("{:?}", _character);
+    }
+
+    fn mouse_motion_event(&mut self, x: f32, y: f32) {
+        let (sw, sh) = screen_size();
+        self.input.mouse_move(&self.screen, vec2(x, y) / vec2(sw, sh));
     }
 
     fn draw(&mut self) {

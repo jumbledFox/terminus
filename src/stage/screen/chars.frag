@@ -14,10 +14,10 @@ void main() {
     vec2 cell_uv = (cell_pos + 0.5 / term_size) * vec2(1.0, -1.0) + vec2(0.0, 1.0);
     vec4 data = texture2D(cells, cell_uv);
 
-    float character  = (data.r * 255.0); 
-    float fg_i =       (data.g * 255.0); 
-    float bg_i =       (data.b * 255.0); 
-    int attrib =    int(data.a * 255.0); 
+    float character  = data.r * 255.0; 
+    float fg_i =       data.g * 255.0; 
+    float bg_i =       data.b * 255.0; 
+    int attrib =   int(data.a * 255.0); 
 
     vec2 cell_local = fract(uv / 8.0);
 
