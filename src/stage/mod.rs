@@ -1,14 +1,13 @@
-use std::{f32::consts::PI, io::Cursor, println};
+use std::println;
 
-use glam::{Mat4, Vec2, Vec3, vec2, vec3};
-use image::ImageReader;
-use miniquad::{Bindings, BufferLayout, BufferSource, BufferType, BufferUsage, EventHandler, FilterMode, KeyCode::T, MipmapFilterMode, Pipeline, PipelineParams, RenderingBackend, ShaderMeta, ShaderSource, TextureId, UniformBlockLayout, UniformDesc, UniformType, UniformsSource, VertexAttribute, VertexFormat, VertexStep, window::{self, screen_size}};
-use quad_rand::gen_range;
+use glam::{Vec2, Vec3, vec2};
+use miniquad::{EventHandler, RenderingBackend, window::{self, screen_size}};
 
-use crate::stage::{input::Input, screen::Screen};
+use crate::stage::{brains::Brains, input::Input, screen::Screen};
 
-pub mod input;
 pub mod screen;
+pub mod input;
+pub mod brains;
 
 pub const COLUMNS: u8 = 80+40;
 pub const ROWS:    u8 = 48+24;
@@ -21,7 +20,7 @@ pub struct Stage {
     ctx: Box<dyn RenderingBackend>,
     screen: Screen,
     input: Input,
-    // program
+    brains: Brains,
 }
 
 impl Stage {
@@ -33,12 +32,14 @@ impl Stage {
             ctx,
             screen,
             input,
+            brains: Brains::new(),
         }
     }
 }
 
 impl EventHandler for Stage {
     fn update(&mut self) {
+        self.brains.update(&mut self.screen, &self.input);
         // for i in 0..26 {
         //     self.screen.char_xy(i+4, 12).set_character(64.0 + i as f32, None, None);
         //     self.screen.char_xy(i+4, 12).set_color_splash(Some(999.0), Some(900.0));
