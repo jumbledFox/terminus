@@ -2,19 +2,24 @@ use crate::stage::{COLUMNS, ROWS, brains::Program, input::Input, screen::{Cell, 
 
 pub struct TestProgram {
     timer: f32,
+    first: bool,
 }
 
 impl TestProgram {
     pub fn new() -> Self {
         Self { 
             timer: 0.0,
+            first: true,
         }
     }
 }
 
 impl Program for TestProgram {
     fn update(&mut self, screen: &mut Screen, input: &Input) {
-        screen.fill(Cell::new(115, 5, 0, 0));
+        if self.first {
+            self.first = false;
+            screen.fill(Cell::new(115, 5, 0, 0));
+        }
 
         for _ in 0..10 {
             let (center_x, center_y) = (
@@ -27,8 +32,8 @@ impl Program for TestProgram {
                 0b111_000_00
             );
 
-            for i in 0..40 {
-                let f = i as f32 / 2.0;
+            for i in 0..20 {
+                let f = i as f32 / 1.0;
                 let (x, y) = (
                     self.timer.sin() * f,
                     self.timer.cos() * f,
@@ -37,7 +42,14 @@ impl Program for TestProgram {
                     (x + center_x) as usize,
                     (y + center_y) as usize,
                 );
-                screen.draw_cell(i_x, i_y, Cell::new(ch, 255, bg, 0));
+
+                let l1 = ((i as f32 / 20.0) * 8.0) as u8;
+                let l2 = 7-l1;
+                let bg = l1 << 5;
+                let fg = l2 << 2;
+                // let ch = 6;
+
+                screen.draw_cell(i_x, i_y, Cell::new(ch, fg, bg, 0));
             }
     
             self.timer += 1.0 / 60.0;
