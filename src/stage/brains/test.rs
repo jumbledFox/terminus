@@ -18,8 +18,10 @@ impl Program for TestProgram {
     fn update(&mut self, screen: &mut Screen, input: &Input) {
         if self.first {
             self.first = false;
-            screen.fill(Cell::new(115, 5, 0, 0));
         }
+        let schs = [90, 116, 106, 117];
+        let screen_ch = schs[((self.timer * 2.0) as usize).rem_euclid(schs.len())];
+        screen.fill(Cell::new(screen_ch, 5, 0, 0));
 
         for _ in 0..10 {
             let (center_x, center_y) = (
@@ -27,13 +29,13 @@ impl Program for TestProgram {
                 ROWS    as f32 / 2.0,
             );
 
-            let (ch, bg) = (
-                ((self.timer*3.0) as usize).rem_euclid(26) as u8 + 64,
-                0b111_000_00
-            );
+            let chs = [0, 1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2, 1];
+            let i = ((self.timer * 3.0) as usize).rem_euclid(chs.len());
+            let ch = chs[i];
+            // let bg = 0b111_000_00;
 
             for i in 0..20 {
-                let f = i as f32 / 1.0;
+                let f = i as f32;
                 let (x, y) = (
                     self.timer.sin() * f,
                     self.timer.cos() * f,
@@ -52,7 +54,7 @@ impl Program for TestProgram {
                 screen.draw_cell(i_x, i_y, Cell::new(ch, fg, bg, 0));
             }
     
-            self.timer += 1.0 / 60.0;
+            self.timer += 1.0 / 120.0;
         }
     }
 }

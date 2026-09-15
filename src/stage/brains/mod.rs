@@ -6,7 +6,7 @@ use crate::stage::{brains::test::TestProgram, input::Input, screen::Screen};
 
 pub mod test;
 
-const UPDATE_TIME: f64 = 1.0 / 60.0;
+const UPDATE_TIME: f64 = 1.0 / 24.0;
 
 pub trait Program {
     // TODO: user adjustable fps, settings,, etc,, see above ^
