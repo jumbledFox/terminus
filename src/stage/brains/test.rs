@@ -1,4 +1,6 @@
-use crate::stage::{COLUMNS, ROWS, brains::Program, input::Input, screen::{Cell, Screen}};
+use quad_rand::gen_range;
+
+use crate::stage::{COLUMNS, ROWS, U_COLUMNS, U_ROWS, brains::Program, input::Input, screen::{Cell, Screen}};
 
 pub struct TestProgram {
     timer: f32,
@@ -17,13 +19,43 @@ impl TestProgram {
 impl Program for TestProgram {
     fn update(&mut self, screen: &mut Screen, input: &Input) {
         if self.first {
+            for i in 0..U_COLUMNS*U_ROWS {
+                let (x, y) = (
+                    i % U_COLUMNS,
+                    i / U_COLUMNS
+                );
+                let ch = match gen_range(0, 2) {
+                    0 => 36,
+                    _ => 41,
+                };
+                let bg = match (x + y) % 2 {
+                    0 => 0b010_010_01,
+                    _ => 0b000_000_00,
+                };
+
+                let (r, g, b) = (
+                    0,
+                    (x * 8) / U_COLUMNS,
+                    (y * 8) / U_ROWS,
+                    // (y * 8) / U_ROWS,
+                );
+
+                // let bg_a = (x * 8) / U_COLUMNS;
+                // println!("{:?}", bg_a);
+                let bg = ((r << 5) + (g << 2) + (b / 2)) as u8;
+                // let bg = ((0b000 << 5) + (bg_a << 2) + (bg_a / 2)) as u8;
+
+                let cell = Cell::new(ch, /*0b010_100_01*/bg, bg, 0);
+                screen.draw_cell(x, y, cell);
+            }
             self.first = false;
         }
+        return;
         let schs = [90, 116, 106, 117];
-        let screen_ch = schs[((self.timer * 2.0) as usize).rem_euclid(schs.len())];
+        let screen_ch = schs[((self.timer * 0.2) as usize).rem_euclid(schs.len())];
         screen.fill(Cell::new(screen_ch, 5, 0, 0));
 
-        for _ in 0..10 {
+        for _ in 0..60 {
             let (center_x, center_y) = (
                 COLUMNS as f32 / 2.0,
                 ROWS    as f32 / 2.0,
