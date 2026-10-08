@@ -34,9 +34,11 @@ impl Program for TestProgram {
                 };
 
                 let (r, g, b) = (
-                    0,
+                    // (y * 8) / U_ROWS,
+                    // 0,
                     (x * 8) / U_COLUMNS,
-                    (y * 8) / U_ROWS,
+                    (x * 8) / U_COLUMNS,
+                    (x * 8) / U_COLUMNS,
                     // (y * 8) / U_ROWS,
                 );
 
@@ -45,7 +47,7 @@ impl Program for TestProgram {
                 let bg = ((r << 5) + (g << 2) + (b / 2)) as u8;
                 // let bg = ((0b000 << 5) + (bg_a << 2) + (bg_a / 2)) as u8;
 
-                let cell = Cell::new(ch, /*0b010_100_01*/bg, bg, 0);
+                let cell = Cell::new(ch, 0b000_000_00, bg, 0);
                 screen.draw_cell(x, y, cell);
             }
             self.first = false;
