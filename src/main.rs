@@ -12,6 +12,11 @@ fn main() {
     miniquad::start(conf, move || Box::new(Stage::new()));
 }
 
+// sprite editor
+// custom sprite pack format
+// different resolutions
+
+// OLD:
 // snake
 // 3d voxel world with per-character dda raycasting, sampling textures, z buffer and billboards..?
 // 0x0 - 0xF for r g and b (custom curves so 0x000 -> dark blue gray, like splash), each character 32 bits
