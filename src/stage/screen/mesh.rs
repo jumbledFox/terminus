@@ -7,7 +7,7 @@ use miniquad::{Bindings, BufferLayout, BufferSource, BufferType, BufferUsage, Fi
 use crate::stage::{COLUMNS, Ctx, ROWS, U_COLUMNS, U_ROWS, screen::Cell};
 
 const CHARS_TEXTURE: &[u8] = include_bytes!("../../../res/chars.png");
-const PAL_TEXTURE: &[u8]   = include_bytes!("../../../res/new_pal.png");
+const PAL_TEXTURE: &[u8]   = include_bytes!("../../../res/pal.png");
 const CHARS_VERT: &str = include_str!("chars.vert");
 const CHARS_FRAG: &str = include_str!("chars.frag");
 

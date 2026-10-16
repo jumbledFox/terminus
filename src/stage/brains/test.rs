@@ -1,3 +1,5 @@
+use std::println;
+
 use quad_rand::gen_range;
 
 use crate::stage::{COLUMNS, ROWS, U_COLUMNS, U_ROWS, brains::Program, input::Input, screen::{Cell, Screen}};
@@ -18,6 +20,37 @@ impl TestProgram {
 
 impl Program for TestProgram {
     fn update(&mut self, screen: &mut Screen, input: &Input) {
+        for i in 0..U_COLUMNS*U_ROWS {
+            let (x, y) = (
+                i % U_COLUMNS,
+                i / U_COLUMNS
+            );
+
+            let x_bits = ((x * 8) / U_COLUMNS) as u16;
+            let y_bits = ((y * 8) / U_ROWS)    as u16;
+            let var = ((self.timer * 4.0).rem_euclid(8.0)) as u16;
+
+            let (a, b, c) = match self.timer.rem_euclid(6.0) {
+                0.0..2.0 => (x_bits, y_bits, var),
+                2.0..4.0 => (y_bits, var, x_bits),
+                _        => (var, x_bits, y_bits)
+            };
+            let bg = (a << 6) + (b << 3) + c;
+
+            // let shift = ((self.timer * 3.0).rem_euclid(3.0).floor()) as u16 * 3;
+
+            // let bg = match x % 3 {
+            //     0 => 0b111 << shift,
+            //     1 => 0b011 << shift,
+            //     _ => 0b001 << shift,
+            // };
+
+            let cell = Cell::new(63+32, bg, 0, 0b00);
+            screen.draw_cell(x, y, cell);
+        }
+        self.timer += 1.0 / 24.0 * 3.0;
+
+        /*
         if self.first {
             for i in 0..U_COLUMNS*U_ROWS {
                 let (x, y) = (
@@ -89,6 +122,6 @@ impl Program for TestProgram {
             }
     
             self.timer += 1.0 / 120.0;
-        }
+        }*/
     }
 }
