@@ -1,15 +1,19 @@
+use std::println;
+
 use miniquad::*;
 use stage::{Stage, COLUMNS, ROWS};
 
 pub mod stage;
 
 fn main() {
+    println!("initialising terminus........");
     quad_rand::srand(miniquad::date::now() as u64);
     let mut conf = conf::Conf::default();
     conf.window_title = "terminal emulator - jumbledFox :3".into();
     conf.window_width  = COLUMNS as i32 * 8 * 3;
     conf.window_height = ROWS    as i32 * 8 * 3;
     miniquad::start(conf, move || Box::new(Stage::new()));
+    println!("yay <3");
 }
 
 // sprite editor

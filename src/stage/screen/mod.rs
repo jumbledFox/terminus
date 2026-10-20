@@ -3,8 +3,9 @@
 
 use quad_rand::gen_range;
 
-use crate::stage::{COLUMNS, Ctx, U_COLUMNS, U_ROWS, screen::mesh::ScreenMesh};
+use crate::stage::{COLUMNS, Ctx, U_COLUMNS, U_ROWS, screen::{cell::Cell, mesh::ScreenMesh}};
 
+pub mod cell;
 mod mesh;
 
 pub enum ViewMode {
@@ -13,55 +14,15 @@ pub enum ViewMode {
     PixelPerfect,
 }
 
-const A_INVERT: u8 = 0b0000_0001;
-const A_FLASH:  u8 = 0b0000_0010;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, bytemuck::Pod, bytemuck::Zeroable)]
-#[repr(C)]
-pub struct Cell {
-    ch: u8,
-    fg: u8, //0brr_ggg_bbb
-    bg: u8, // ""
-    attrib: u8
-    // fg bg xxxx flash flash
-}
-
-impl Cell {
-    pub fn new(ch: u8, fg: u16, bg: u16, flash: u8) -> Self {
-        let f = (fg & 0b1111_1111) as u8;
-        let b = (bg & 0b1111_1111) as u8; 
-        
-        let fg_r = ((fg >> 8) & 1) as u8;
-        let bg_r = ((bg >> 8) & 1) as u8;
-
-        let attrib =
-            (flash & 0b11) +
-            (fg_r << 7) +
-            (bg_r << 6);
-
-        Self { ch, fg: f, bg: b, attrib }
-    }
-
-    // pub fn new(ch: u8, fg: u8, bg: u8, attrib: u8) -> Self {
-    //     Self { ch, fg, bg, attrib }
-    // }
-}
-
 pub struct Screen {
     mesh: ScreenMesh,
-    cells: [Cell; U_COLUMNS * U_ROWS]
+    cells: [Cell; U_COLUMNS * U_ROWS],
 }
 
 impl Screen {
     pub fn new(ctx: &mut Ctx) -> Self {
-        let mut cells = [Cell { ch: 0, fg: 0, bg: 0, attrib: 0}; U_COLUMNS*U_ROWS];
         // fill the screen with garbage :3
-        for c in cells.iter_mut() {
-            c.ch     = gen_range(0, 127);
-            c.fg     = gen_range(0, 255);
-            c.bg     = gen_range(0, 255);
-            c.attrib = gen_range(0, 255);
-        }
+        let cells = [Cell::random(); U_COLUMNS*U_ROWS];
 
         let mut screen = Self {
             mesh: ScreenMesh::new(ctx),
@@ -80,6 +41,7 @@ impl Screen {
         self.cells[Self::xy_to_index(x, y)] = cell;
     }
 
+    // TODO: Maybe not?
     pub fn draw_line(&mut self) {
         // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
     }
@@ -90,7 +52,10 @@ impl Screen {
 
     pub fn update_mesh(&mut self, ctx: &mut Ctx) {
         self.mesh.update_texture(ctx, bytemuck::cast_slice(&self.cells[..]));
-        // self.mesh.update_texture(ctx, &[0b111_000_11; 4*U_COLUMNS*U_ROWS]);
+    }
+
+    pub fn resize_event(&mut self, width: f32, height: f32) {
+
     }
 
     pub fn draw(&mut self, ctx: &mut Ctx) {

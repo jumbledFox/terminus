@@ -40,10 +40,6 @@ impl Stage {
 impl EventHandler for Stage {
     fn update(&mut self) {
         self.brains.update(&mut self.screen, &self.input);
-        // for i in 0..26 {
-        //     self.screen.char_xy(i+4, 12).set_character(64.0 + i as f32, None, None);
-        //     self.screen.char_xy(i+4, 12).set_color_splash(Some(999.0), Some(900.0));
-        // }
     }
 
     fn char_event(&mut self, _character: char, _keymods: miniquad::KeyMods, _repeat: bool) {
@@ -53,6 +49,10 @@ impl EventHandler for Stage {
     fn mouse_motion_event(&mut self, x: f32, y: f32) {
         let (sw, sh) = screen_size();
         self.input.mouse_move(&self.screen, vec2(x, y) / vec2(sw, sh));
+    }
+
+    fn resize_event(&mut self, width: f32, height: f32) {
+        self.screen.resize_event(width, height);
     }
 
     fn draw(&mut self) {

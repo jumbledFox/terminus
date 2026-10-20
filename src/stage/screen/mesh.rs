@@ -130,7 +130,7 @@ impl ScreenMesh {
 
     pub fn draw(&self, ctx: &mut Ctx) {
         // TODO: Move this to screen,
-
+        // UGHHHH WHY IS PROGRAMMING SO HARD
         // the screen is the actual monitor, the view is the terminal display
         let (sw, sh) = screen_size();
         let (vw, vh) = (COLUMNS as f32 * 8.0, ROWS as f32 * 8.0);
@@ -148,6 +148,7 @@ impl ScreenMesh {
                 (0.0, vw, -y, vh+y)
             },
         };
+        // let (l, r, b, t) = (0.0, 64.0, 0.0, 64.0);
         let proj = Mat4::orthographic_rh_gl(
             l, r, b, t,
             0.001, 100.0,
@@ -168,6 +169,7 @@ impl ScreenMesh {
         let mvp = proj * view;
 
         ctx.begin_default_pass(Default::default());
+        ctx.clear(Some((1.0, 0.0, 0.0, 1.0)), None, None);
         ctx.apply_pipeline(&self.pipeline);
         ctx.apply_bindings(&self.bindings);
         ctx.apply_uniforms(UniformsSource::table(&Uniforms { mvp }));

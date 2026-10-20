@@ -2,7 +2,7 @@ use std::println;
 
 use quad_rand::gen_range;
 
-use crate::stage::{COLUMNS, ROWS, U_COLUMNS, U_ROWS, brains::Program, input::Input, screen::{Cell, Screen}};
+use crate::stage::{COLUMNS, ROWS, U_COLUMNS, U_ROWS, brains::Program, input::Input, screen::{Screen, cell::Cell}};
 
 pub struct TestProgram {
     timer: f32,
@@ -20,6 +20,7 @@ impl TestProgram {
 
 impl Program for TestProgram {
     fn update(&mut self, screen: &mut Screen, input: &Input) {
+        let (s_width, s_height) = (16, 16);
         for i in 0..U_COLUMNS*U_ROWS {
             let (x, y) = (
                 i % U_COLUMNS,
@@ -48,8 +49,9 @@ impl Program for TestProgram {
             let cell = Cell::new(63+32, bg, 0, 0b00);
             screen.draw_cell(x, y, cell);
         }
-        self.timer += 1.0 / 24.0 * 3.0;
+        screen.draw_cell(0, 0, Cell::new(64, 0b111111111, 0b111000000, 0));
 
+        self.timer += 1.0 / 24.0 * 3.0;
         /*
         if self.first {
             for i in 0..U_COLUMNS*U_ROWS {
