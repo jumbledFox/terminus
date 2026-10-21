@@ -28,28 +28,41 @@ impl Program for TestProgram {
                 let y_bits = ((y * 8) / s_height) as u16;
                 let var = ((self.timer * 4.0).rem_euclid(8.0)) as u16;
     
-                let (a, b, c) = match self.timer.rem_euclid(8.0) {
-                    0.0..2.0 => (x_bits, y_bits, var),
-                    2.0..4.0 => (y_bits, var, x_bits),
-                    4.0..6.0 => (var, x_bits, y_bits),
-                    _        => (var, var, var),
+                let (a, b, c) = match self.timer.rem_euclid(20.0) {
+                     0.0.. 2.0 => (x_bits, y_bits, var),
+                     2.0.. 4.0 => (y_bits, var, x_bits),
+                     4.0.. 6.0 => (var, x_bits, y_bits),
+                     6.0.. 8.0 => (var,   0, y_bits),
+                     8.0..10.0 => (var, var, y_bits),
+                    10.0..12.0 => (y_bits, var,   0),
+                    12.0..14.0 => (y_bits, var, var),
+                    14.0..16.0 => (  0, y_bits, var),
+                    16.0..18.0 => (var, y_bits, var),
+                    _          => (var, var, var),
                 };
                 let bg = (a << 6) + (b << 3) + c;
-    
-                let cell = Cell::new(63+32, bg, 0, 0b00);
+
+                let ch = match (x + y) % 3 {
+                    0 => 13,
+                    1 => 14,
+                    _ => 15,
+                };
+                let cell = Cell::new(ch, bg, 0, 0b00);
                 screen.draw_cell(x, y, cell);
             }
         }
 
         for i in 0..U_ROWS {
-            let (letter, blank, y1, y2) = (
+            let (letter, blank, y1, y2, y3) = (
                 Cell::new(64+(i % 26) as u8, 0b111111111, 0b111000000, 0),
                 Cell::new(0, 0, 0b111000000, 0),
                 i + 1,
                 i.saturating_sub(1),
+                i.saturating_sub(2),
             );
             screen.draw_cell(i, y1, blank);
             screen.draw_cell(i, y2, blank);
+            screen.draw_cell(i, y3, blank);
             screen.draw_cell(i, i, letter);
         }
 
@@ -79,12 +92,36 @@ impl Program for TestProgram {
                 Cell::new(chars.2, fg, bg, 0),
             );
 
-            screen.draw_cell(0, y, cells.2);
-            screen.draw_cell(1, y, cells.1);
-            screen.draw_cell(2, y, cells.0);
+            screen.draw_cell(0, s_height-y-1, cells.2);
+            screen.draw_cell(1, s_height-y-1, cells.1);
+            screen.draw_cell(2, s_height-y-1, cells.0);
         }
 
-        self.timer += 1.0 / 24.0 * 3.0;
+        for i in 0..=255 {
+            screen.draw_cell(3 + (i % 16), 16 - (i / 16), Cell::new(i as u8, 0b111111111, 0, 0));
+        }
+
+        if let Some(m) = input.mouse_pos() {
+            let cols = [
+                0b111_000_000,
+                0b111_111_000,
+                0b000_111_000,
+                0b000_111_111,
+                0b000_000_111,
+                0b111_000_111,
+            ];
+            let col = cols[(self.timer * 4.0).rem_euclid(6.0) as usize];
+
+            let (fg, bg, ch) = match m.subcell().to_array() {
+                [0..4, 0..4] => (col, 0, 4),
+                [   _, 0..4] => (0, col, 7),
+                [0..4,    _] => (col, 0, 1),
+                [   _,    _] => (col, 0, 2),
+            };
+            screen.draw_cell(m.cell().x, m.cell().y, Cell::new(ch, fg, bg, 0));
+        }
+
+        self.timer += 1.0 / 60.0 * 3.0;
         /*
         if self.first {
             for i in 0..U_COLUMNS*U_ROWS {

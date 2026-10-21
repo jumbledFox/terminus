@@ -6,7 +6,7 @@ use crate::stage::{brains::test::TestProgram, input::Input, screen::Screen};
 
 pub mod test;
 
-const UPDATE_TIME: f64 = 1.0 / 24.0;
+const UPDATE_TIME: f64 = 1.0 / 60.0;
 
 pub trait Program {
     // TODO: user adjustable fps, settings,, etc,, see above ^
@@ -19,6 +19,8 @@ pub struct Brains {
     last_time: f64,
     deltatime: f64,
     update_timer: f64,
+
+    slow: bool,
 }
 
 impl Brains {
@@ -28,6 +30,7 @@ impl Brains {
             last_time: miniquad::date::now(),
             deltatime: 0.0,
             update_timer: 0.0,
+            slow: false,
         }
     }
 

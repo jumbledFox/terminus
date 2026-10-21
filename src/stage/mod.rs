@@ -42,8 +42,28 @@ impl EventHandler for Stage {
         self.brains.update(&mut self.screen, &self.input);
     }
 
+    fn key_down_event(&mut self, keycode: miniquad::KeyCode, _keymods: miniquad::KeyMods, repeat: bool) {
+        self.input.key_down_event(keycode, repeat);
+    }
+    fn key_up_event(&mut self, keycode: miniquad::KeyCode, _keymods: miniquad::KeyMods) {
+        self.input.key_up_event(keycode);
+    }
+
+    fn mouse_enter_event(&mut self, _button: miniquad::MouseButton ,_x: f32, _y: f32 ) {
+
+    }
+    fn mouse_leave_event(&mut self) {
+
+    }
+    fn window_minimized_event(&mut self) {
+
+    }
+    fn window_restored_event(&mut self) {
+
+    }
+
     fn char_event(&mut self, _character: char, _keymods: miniquad::KeyMods, _repeat: bool) {
-        println!("{:?}", _character);
+        // println!("{:?}", _character);
         if _character == ' ' {
             let scale = match self.screen.scale() {
                 Scale::Full => Scale::Half,
@@ -58,7 +78,7 @@ impl EventHandler for Stage {
 
     fn mouse_motion_event(&mut self, x: f32, y: f32) {
         let (sw, sh) = screen_size();
-        self.input.mouse_move(&self.screen, vec2(x, y) / vec2(sw, sh));
+        self.input.mouse_move_event(&self.screen, vec2(x, y) / vec2(sw, sh));
     }
 
     fn resize_event(&mut self, width: f32, height: f32) {

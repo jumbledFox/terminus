@@ -96,20 +96,24 @@ impl Screen {
                 COLUMNS as f32 * 8.0, 
                 0.0, 
                 ROWS as f32 * 8.0),
+            // TODO: PixelPerfect
         };
     }
 
+    pub fn lrbt(&self) -> (f32, f32, f32, f32) {
+        self.lrbt
+    }
     pub fn scale(&self) -> Scale {
         self.scale
     }
     pub fn set_scale(&mut self, scale: Scale) {
         self.scale = scale;
+        self.resize(None);
     }
     pub fn test_view(&mut self) {
         self.view_mode = match self.view_mode {
             ViewMode::Stretch => ViewMode::Fit,
-            ViewMode::Fit => ViewMode::PixelPerfect,
-            ViewMode::PixelPerfect => ViewMode::Stretch,
+            _ =>  ViewMode::Stretch,
         };
         self.resize(None);
     }

@@ -152,7 +152,7 @@ impl ScreenMesh {
         let mvp = proj * view;
 
         ctx.begin_default_pass(Default::default());
-        ctx.clear(Some((0.3, 1.0, 0.1, 1.0)), None, None);
+        ctx.clear(Some((0.0, 0.0, 0.0, 1.0)), None, None);
         ctx.apply_pipeline(&self.pipeline);
         ctx.apply_bindings(&self.bindings);
         ctx.apply_uniforms(UniformsSource::table(&Uniforms { mvp, scale }));
