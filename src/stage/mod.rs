@@ -3,7 +3,7 @@ use std::println;
 use glam::{Vec2, Vec3, vec2};
 use miniquad::{EventHandler, RenderingBackend, window::{self, screen_size}};
 
-use crate::stage::{brains::Brains, input::Input, screen::{ScaleMode, Screen}};
+use crate::stage::{brains::Brains, input::Input, screen::{Scale, Screen}};
 
 pub mod screen;
 pub mod input;
@@ -46,10 +46,13 @@ impl EventHandler for Stage {
         println!("{:?}", _character);
         if _character == ' ' {
             let scale = match self.screen.scale() {
-                ScaleMode::Full => ScaleMode::Half,
-                _ => ScaleMode::Full,
+                Scale::Full => Scale::Half,
+                _ => Scale::Full,
             };
             self.screen.set_scale(scale);
+        }
+        if _character == 'v' {
+            self.screen.test_view();
         }
     }
 
@@ -59,7 +62,7 @@ impl EventHandler for Stage {
     }
 
     fn resize_event(&mut self, width: f32, height: f32) {
-        // self.screen.resize_event(width, height);
+        self.screen.resize(Some((width, height)));
     }
 
     fn draw(&mut self) {

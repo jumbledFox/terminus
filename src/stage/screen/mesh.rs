@@ -130,36 +130,17 @@ impl ScreenMesh {
         ctx.texture_update(self.cells_texture, bytes);
     }
 
-    pub fn draw(&self, ctx: &mut Ctx, scale: f32) {
-        // TODO: Move this to screen,
-        // UGHHHH WHY IS PROGRAMMING SO HARD
-        // the screen is the actual monitor, the view is the terminal display
-        let (sw, sh) = screen_size();
-        let (vw, vh) = (COLUMNS as f32 * 8.0, ROWS as f32 * 8.0);
-
-        // derived from notes in my silly notebook,,,
-        let (l, r, b, t) = match vw/vh < sw/sh {
-            // if the screen is wider than the view
-            true  => {
-                let x = ((sw/sh)*vh - vw) / 2.0;
-                (-x, vw+x, 0.0, vh)
-            },
-            // if the screen is taller than the view
-            false => {
-                let y = ((sh/sw)*vw - vh) / 2.0;
-                (0.0, vw, -y, vh+y)
-            },
-        };
-        // let (l, r, b, t) = (0.0, 64.0, 0.0, 64.0);
+    pub fn draw(&self, ctx: &mut Ctx, lrbt: (f32, f32, f32, f32), scale: f32) {
+        let (l, r, b, t) = lrbt;
         let proj = Mat4::orthographic_rh_gl(
             l, r, b, t,
             0.001, 100.0,
         );
         // todo: no stretch, pixel perfect modes
         // let proj = Mat4::orthographic_rh_gl(
-        //     -10.0, 
+        //     0.0, 
         //     COLUMNS as f32 * 8.0, 
-        //     -10.0, 
+        //     0.0, 
         //     ROWS as f32 * 8.0,
         //     0.001, 100.0,
         // );
@@ -171,7 +152,7 @@ impl ScreenMesh {
         let mvp = proj * view;
 
         ctx.begin_default_pass(Default::default());
-        ctx.clear(Some((1.0, 0.0, 0.0, 1.0)), None, None);
+        ctx.clear(Some((0.3, 1.0, 0.1, 1.0)), None, None);
         ctx.apply_pipeline(&self.pipeline);
         ctx.apply_bindings(&self.bindings);
         ctx.apply_uniforms(UniformsSource::table(&Uniforms { mvp, scale }));

@@ -7,7 +7,6 @@ uniform sampler2D atlas;
 uniform sampler2D pal;
 
 void main() {
-    // TODO: A nice way of two-mode res
     const vec2 term_size = vec2(120.0, 72.0);
 
     vec2 cell_pos = floor(uv / 8.0) / term_size;
@@ -33,6 +32,7 @@ void main() {
     vec4 fg = texelFetch(pal, fgCoord, 0);
     vec4 bg = texelFetch(pal, bgCoord, 0);
 
+    // TODO: Fix texture bleeding
     vec2 cell_local = fract(uv / 8.0);
     vec2 glyph_offset = vec2(mod(character, 16.0), 15.0 - floor(character / 16.0));
     vec4 glyph = texture2D(atlas, (cell_local + glyph_offset) / 16.0);
