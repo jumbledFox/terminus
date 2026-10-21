@@ -49,7 +49,9 @@ impl Program for TestProgram {
             let cell = Cell::new(63+32, bg, 0, 0b00);
             screen.draw_cell(x, y, cell);
         }
-        screen.draw_cell(0, 0, Cell::new(64, 0b111111111, 0b111000000, 0));
+        for i in 0..U_ROWS {
+            screen.draw_cell(i, i, Cell::new(64+(i % 26) as u8, 0b111111111, 0b111000000, 0));
+        }
 
         self.timer += 1.0 / 24.0 * 3.0;
         /*

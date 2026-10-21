@@ -8,8 +8,8 @@ uniform sampler2D pal;
 
 void main() {
     // TODO: A nice way of two-mode res
-    vec2 uv = uv / 2.0;
     const vec2 term_size = vec2(120.0, 72.0);
+    vec2 uv = uv / 2.0 + vec2(0.0, 72.0 * 4.0);
 
     vec2 cell_pos = floor(uv / 8.0) / term_size;
 
