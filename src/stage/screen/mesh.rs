@@ -14,6 +14,7 @@ const CHARS_FRAG: &str = include_str!("chars.frag");
 #[repr(C)]
 struct Uniforms {
     mvp: Mat4,
+    scale: f32,
     // data: u32,
 }
 
@@ -106,7 +107,8 @@ impl ScreenMesh {
                 ],
                 uniforms: UniformBlockLayout {
                     uniforms: vec![
-                        UniformDesc::new("mvp", UniformType::Mat4),
+                        UniformDesc::new("mvp",   UniformType::Mat4),
+                        UniformDesc::new("scale", UniformType::Float1),
                     ]
                 }
             }
@@ -128,7 +130,7 @@ impl ScreenMesh {
         ctx.texture_update(self.cells_texture, bytes);
     }
 
-    pub fn draw(&self, ctx: &mut Ctx) {
+    pub fn draw(&self, ctx: &mut Ctx, scale: f32) {
         // TODO: Move this to screen,
         // UGHHHH WHY IS PROGRAMMING SO HARD
         // the screen is the actual monitor, the view is the terminal display
@@ -172,7 +174,7 @@ impl ScreenMesh {
         ctx.clear(Some((1.0, 0.0, 0.0, 1.0)), None, None);
         ctx.apply_pipeline(&self.pipeline);
         ctx.apply_bindings(&self.bindings);
-        ctx.apply_uniforms(UniformsSource::table(&Uniforms { mvp }));
+        ctx.apply_uniforms(UniformsSource::table(&Uniforms { mvp, scale }));
         ctx.draw(0, 6, 1);
 
         ctx.end_render_pass();

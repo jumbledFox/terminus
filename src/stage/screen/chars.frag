@@ -9,11 +9,10 @@ uniform sampler2D pal;
 void main() {
     // TODO: A nice way of two-mode res
     const vec2 term_size = vec2(120.0, 72.0);
-    vec2 uv = uv / 2.0 + vec2(0.0, 72.0 * 4.0);
 
     vec2 cell_pos = floor(uv / 8.0) / term_size;
 
-    vec2 cell_uv = (cell_pos + 0.5 / term_size) * vec2(1.0, -1.0) + vec2(0.0, 1.0);
+    vec2 cell_uv = (cell_pos + 0.5 / term_size);
     vec4 data = texture2D(cells, cell_uv);
 
     // TODO: Make this an int too?!

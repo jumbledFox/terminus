@@ -20,37 +20,68 @@ impl TestProgram {
 
 impl Program for TestProgram {
     fn update(&mut self, screen: &mut Screen, input: &Input) {
-        let (s_width, s_height) = (16, 16);
-        for i in 0..U_COLUMNS*U_ROWS {
-            let (x, y) = (
-                i % U_COLUMNS,
-                i / U_COLUMNS
+        let (s_width, s_height) = (screen.width(), screen.height());
+
+        for x in 0..s_width {
+            for y in 0..s_height {
+                let x_bits = ((x * 8) / s_width)  as u16;
+                let y_bits = ((y * 8) / s_height) as u16;
+                let var = ((self.timer * 4.0).rem_euclid(8.0)) as u16;
+    
+                let (a, b, c) = match self.timer.rem_euclid(8.0) {
+                    0.0..2.0 => (x_bits, y_bits, var),
+                    2.0..4.0 => (y_bits, var, x_bits),
+                    4.0..6.0 => (var, x_bits, y_bits),
+                    _        => (var, var, var),
+                };
+                let bg = (a << 6) + (b << 3) + c;
+    
+                let cell = Cell::new(63+32, bg, 0, 0b00);
+                screen.draw_cell(x, y, cell);
+            }
+        }
+
+        for i in 0..U_ROWS {
+            let (letter, blank, y1, y2) = (
+                Cell::new(64+(i % 26) as u8, 0b111111111, 0b111000000, 0),
+                Cell::new(0, 0, 0b111000000, 0),
+                i + 1,
+                i.saturating_sub(1),
+            );
+            screen.draw_cell(i, y1, blank);
+            screen.draw_cell(i, y2, blank);
+            screen.draw_cell(i, i, letter);
+        }
+
+        for y in 0..s_height {
+            let digits = (
+                 y % 10,
+                (y / 10) % 10,
+                (y / 100) % 10,
+            );
+            let chars = (
+                96 + digits.0 as u8,
+                match y >= 10 {
+                    false => 0,
+                    _ => 96 + digits.1 as u8,
+                },
+                match y >= 100 {
+                    false => 0,
+                    _ => 96 + digits.2 as u8,
+                },
+            );
+            let (fg, bg) = (
+                0b111_110_010, 0b011_001_000
+            );
+            let cells = (
+                Cell::new(chars.0, fg, bg, 0),
+                Cell::new(chars.1, fg, bg, 0),
+                Cell::new(chars.2, fg, bg, 0),
             );
 
-            let x_bits = ((x * 8) / U_COLUMNS) as u16;
-            let y_bits = ((y * 8) / U_ROWS)    as u16;
-            let var = ((self.timer * 4.0).rem_euclid(8.0)) as u16;
-
-            let (a, b, c) = match self.timer.rem_euclid(6.0) {
-                0.0..2.0 => (x_bits, y_bits, var),
-                2.0..4.0 => (y_bits, var, x_bits),
-                _        => (var, x_bits, y_bits)
-            };
-            let bg = (a << 6) + (b << 3) + c;
-
-            // let shift = ((self.timer * 3.0).rem_euclid(3.0).floor()) as u16 * 3;
-
-            // let bg = match x % 3 {
-            //     0 => 0b111 << shift,
-            //     1 => 0b011 << shift,
-            //     _ => 0b001 << shift,
-            // };
-
-            let cell = Cell::new(63+32, bg, 0, 0b00);
-            screen.draw_cell(x, y, cell);
-        }
-        for i in 0..U_ROWS {
-            screen.draw_cell(i, i, Cell::new(64+(i % 26) as u8, 0b111111111, 0b111000000, 0));
+            screen.draw_cell(0, y, cells.2);
+            screen.draw_cell(1, y, cells.1);
+            screen.draw_cell(2, y, cells.0);
         }
 
         self.timer += 1.0 / 24.0 * 3.0;

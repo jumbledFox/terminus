@@ -3,7 +3,7 @@ use std::println;
 use glam::{Vec2, Vec3, vec2};
 use miniquad::{EventHandler, RenderingBackend, window::{self, screen_size}};
 
-use crate::stage::{brains::Brains, input::Input, screen::Screen};
+use crate::stage::{brains::Brains, input::Input, screen::{ScaleMode, Screen}};
 
 pub mod screen;
 pub mod input;
@@ -44,6 +44,13 @@ impl EventHandler for Stage {
 
     fn char_event(&mut self, _character: char, _keymods: miniquad::KeyMods, _repeat: bool) {
         println!("{:?}", _character);
+        if _character == ' ' {
+            let scale = match self.screen.scale() {
+                ScaleMode::Full => ScaleMode::Half,
+                _ => ScaleMode::Full,
+            };
+            self.screen.set_scale(scale);
+        }
     }
 
     fn mouse_motion_event(&mut self, x: f32, y: f32) {
@@ -52,7 +59,7 @@ impl EventHandler for Stage {
     }
 
     fn resize_event(&mut self, width: f32, height: f32) {
-        self.screen.resize_event(width, height);
+        // self.screen.resize_event(width, height);
     }
 
     fn draw(&mut self) {
