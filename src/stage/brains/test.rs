@@ -1,11 +1,15 @@
 use std::println;
 
+use glam::{Vec2, vec2};
+use miniquad::KeyCode;
 use quad_rand::gen_range;
 
-use crate::stage::{COLUMNS, ROWS, U_COLUMNS, U_ROWS, brains::Program, input::Input, screen::{Screen, cell::Cell}};
+use crate::stage::{COLUMNS, ROWS, U_COLUMNS, U_ROWS, brains::Program, input::Input, screen::{Scale, Screen, cell::Cell}};
 
 pub struct TestProgram {
     timer: f32,
+    pos: Vec2,
+    vel: Vec2,
     first: bool,
 }
 
@@ -13,6 +17,8 @@ impl TestProgram {
     pub fn new() -> Self {
         Self { 
             timer: 0.0,
+            pos: vec2(COLUMNS as f32 / 2.0, ROWS as f32 / 2.0),
+            vel: Vec2::ZERO,
             first: true,
         }
     }
@@ -21,6 +27,34 @@ impl TestProgram {
 impl Program for TestProgram {
     fn update(&mut self, screen: &mut Screen, input: &Input) {
         let (s_width, s_height) = (screen.width(), screen.height());
+
+        if input.key_pressed(KeyCode::Space) {
+            let scale = match screen.scale() {
+                Scale::Full => Scale::Half,
+                Scale::Half => Scale::Full,
+            };
+            screen.set_scale(scale);
+        }
+        if input.key_pressed(KeyCode::Tab) {
+            screen.test_view();
+        }
+
+        let mut mov = Vec2::ZERO;
+        if input.key_down(KeyCode::W) {
+            mov.y += 1.0;
+        }
+        if input.key_down(KeyCode::S) {
+            mov.y -= 1.0;
+        }
+        if input.key_down(KeyCode::A) {
+            mov.x -= 1.0;
+        }
+        if input.key_down(KeyCode::D) {
+            mov.x += 1.0;
+        }
+        self.vel = self.vel + mov.normalize_or_zero() * (2.0 / 24.0);
+        self.pos += self.vel;
+        self.vel *= 0.9;
 
         for x in 0..s_width {
             for y in 0..s_height {
@@ -120,6 +154,29 @@ impl Program for TestProgram {
             };
             screen.draw_cell(m.cell().x, m.cell().y, Cell::new(ch, fg, bg, 0));
         }
+
+        let (cx, cy) = (
+            self.pos.x as i32,
+            self.pos.y as i32,
+        );
+
+        for ix in -5..=5 {
+            for iy in -4..=4 {
+                let cell = Cell::new(63, 0b000111000, 0, 0);
+
+                let (col, row) = (COLUMNS as i32, ROWS as i32);
+                if (ix + cx) >= col || (ix + cx) < 0 {
+                    continue;
+                }
+
+                let x = (ix + cx) as usize;
+                let y = (iy + cy) as usize;
+
+                screen.draw_cell(x, y, cell);
+            }
+        }
+
+        // screen.draw_cell(self.pos.x as usize, self.pos.y as usize, Cell::new(64, 0b000111000, 0b111111111, 0));
 
         self.timer += 1.0 / 60.0 * 3.0;
         /*

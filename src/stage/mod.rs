@@ -8,6 +8,7 @@ use crate::stage::{brains::Brains, input::Input, screen::{Scale, Screen}};
 pub mod screen;
 pub mod input;
 pub mod brains;
+pub mod programs;
 
 pub const COLUMNS: u8 = 80+40;
 pub const ROWS:    u8 = 48+24;
@@ -40,6 +41,7 @@ impl Stage {
 impl EventHandler for Stage {
     fn update(&mut self) {
         self.brains.update(&mut self.screen, &self.input);
+        self.input.end();
     }
 
     fn key_down_event(&mut self, keycode: miniquad::KeyCode, _keymods: miniquad::KeyMods, repeat: bool) {
@@ -63,17 +65,7 @@ impl EventHandler for Stage {
     }
 
     fn char_event(&mut self, _character: char, _keymods: miniquad::KeyMods, _repeat: bool) {
-        // println!("{:?}", _character);
-        if _character == ' ' {
-            let scale = match self.screen.scale() {
-                Scale::Full => Scale::Half,
-                _ => Scale::Full,
-            };
-            self.screen.set_scale(scale);
-        }
-        if _character == 'v' {
-            self.screen.test_view();
-        }
+        // TODO
     }
 
     fn mouse_motion_event(&mut self, x: f32, y: f32) {

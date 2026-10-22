@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use glam::{USizeVec2, Vec2, usizevec2, vec2};
 use miniquad::KeyCode;
 
@@ -24,12 +26,19 @@ impl MousePos {
 
 pub struct Input {
     mouse_pos: Option<MousePos>,
+    keys_pressed:  HashSet<KeyCode>,
+    keys_down:     HashSet<KeyCode>,
+    keys_released: HashSet<KeyCode>,
+    // TODO: Specialised code for typing 
 }
 
 impl Input {
     pub fn new() -> Self {
         Self {
             mouse_pos: None,
+            keys_pressed:  HashSet::with_capacity(8),
+            keys_down:     HashSet::with_capacity(8),
+            keys_released: HashSet::with_capacity(8),
         }
     }
 
@@ -37,12 +46,30 @@ impl Input {
         self.mouse_pos
     }
 
-    pub fn key_down_event(&mut self, keycode: KeyCode, repeat: bool) {
-
+    pub fn key_pressed(&self, keycode: KeyCode) -> bool {
+        self.keys_pressed.contains(&keycode)
+    }
+    pub fn key_down(&self, keycode: KeyCode) -> bool {
+        self.keys_down.contains(&keycode)
+    }
+    pub fn key_released(&self, keycode: KeyCode) -> bool {
+        self.keys_released.contains(&keycode)
     }
 
-    pub fn key_up_event(&mut self, keycode: KeyCode) {
+    pub fn end(&mut self) {
+        self.keys_pressed.clear();
+        self.keys_released.clear();
+    }
 
+    pub fn key_down_event(&mut self, keycode: KeyCode, repeat: bool) {
+        if !repeat {
+            self.keys_pressed.insert(keycode);
+            self.keys_down.insert(keycode);
+        }
+    }
+    pub fn key_up_event(&mut self, keycode: KeyCode) {
+        self.keys_down.remove(&keycode);
+        self.keys_released.insert(keycode);
     }
 
     pub fn mouse_move_event(&mut self, screen: &Screen, pos_norm: Vec2) {
