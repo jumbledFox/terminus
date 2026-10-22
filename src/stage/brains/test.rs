@@ -101,34 +101,23 @@ impl Program for TestProgram {
         }
 
         for y in 0..s_height {
-            let digits = (
-                 y % 10,
-                (y / 10) % 10,
-                (y / 100) % 10,
-            );
-            let chars = (
-                96 + digits.0 as u8,
-                match y >= 10 {
-                    false => 0,
-                    _ => 96 + digits.1 as u8,
-                },
-                match y >= 100 {
-                    false => 0,
-                    _ => 96 + digits.2 as u8,
-                },
-            );
-            let (fg, bg) = (
-                0b111_110_010, 0b011_001_000
-            );
-            let cells = (
-                Cell::new(chars.0, fg, bg, 0),
-                Cell::new(chars.1, fg, bg, 0),
-                Cell::new(chars.2, fg, bg, 0),
+            let (bright, dim, bg) = (
+                0b111_010_101,
+                0b101_001_011,
+                0b011_000_010,
             );
 
-            screen.draw_cell(0, s_height-y-1, cells.2);
-            screen.draw_cell(1, s_height-y-1, cells.1);
-            screen.draw_cell(2, s_height-y-1, cells.0);
+            let mut draw_digit = |d: usize, max: usize, x: usize| {
+                let (ch, fg) = match y >= max {
+                    false => (96, dim),
+                    _ => (96 + d as u8, bright)
+                };
+                screen.draw_cell(x, s_height-y-1, Cell::new(ch, fg, bg, 0));
+            };
+
+            draw_digit( y % 10,          0, 2);
+            draw_digit((y / 10)  % 10,  10, 1);
+            draw_digit((y / 100) % 10, 100, 0);
         }
 
         for i in 0..=255 {
