@@ -107,17 +107,20 @@ impl Program for TestProgram {
                 0b011_000_010,
             );
 
+            let i = (y + (self.timer * 8.0) as usize).rem_euclid(999);
+
             let mut draw_digit = |d: usize, max: usize, x: usize| {
-                let (ch, fg) = match y >= max {
+                let (ch, fg) = match i >= max {
                     false => (96, dim),
                     _ => (96 + d as u8, bright)
                 };
+                // TODO: Use i32 instead of usize for coordinates?
                 screen.draw_cell(x, s_height-y-1, Cell::new(ch, fg, bg, 0));
             };
 
-            draw_digit( y % 10,          0, 2);
-            draw_digit((y / 10)  % 10,  10, 1);
-            draw_digit((y / 100) % 10, 100, 0);
+            draw_digit( i % 10,          0, 2);
+            draw_digit((i / 10)  % 10,  10, 1);
+            draw_digit((i / 100) % 10, 100, 0);
         }
 
         for i in 0..=255 {
