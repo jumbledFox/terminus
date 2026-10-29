@@ -2,7 +2,11 @@
 
 use std::println;
 
-use crate::stage::{brains::{audiotest::AudioTest, test::TestProgram}, input::Input, screen::Screen};
+use crate::stage::{
+    brains::{audiotest::AudioTest, test::TestProgram},
+    input::Input,
+    screen::Screen,
+};
 
 pub mod audiotest;
 pub mod test;
@@ -10,7 +14,7 @@ pub mod test;
 const UPDATE_TIME: f64 = 1.0 / 60.0;
 
 pub trait Program {
-    fn init(&mut self, _screen: &mut Screen, _input: &Input) { }
+    fn init(&mut self, _screen: &mut Screen, _input: &Input) {}
     // TODO: user adjustable fps, settings,, etc,, see above ^
     // Called 20/30/60 times a frame
     fn update(&mut self, _screen: &mut Screen, _input: &Input);
@@ -28,7 +32,7 @@ pub struct Brains {
 impl Brains {
     pub fn new() -> Self {
         Self {
-            // program: Some(Box::new(TestProgram::new())),
+            //program: Some(Box::new(TestProgram::new())),
             program: Some(Box::new(AudioTest::new())),
             last_time: miniquad::date::now(),
             deltatime: 0.0,
