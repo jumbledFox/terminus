@@ -1,9 +1,10 @@
 use std::{
-    f32::consts::TAU,
+    f32::consts::{PI, TAU},
     sync::mpsc::{self, Sender, TryRecvError},
 };
 
 use miniquad::KeyCode::{self, H};
+use quad_rand::gen_range;
 use tinyaudio::{OutputDevice, OutputDeviceParameters, run_output_device};
 
 use crate::stage::{
@@ -16,7 +17,9 @@ use crate::stage::{
 enum Wave {
     Sine,
     Square { duty: f32 },
+    Triangle,
     Saw,
+    Noise,
 }
 
 enum Command {
@@ -63,17 +66,27 @@ impl AudioTest {
 
                     clock = (clock + 1.0) % sample_rate;
 
-                    let value = match wave {
-                        Wave::Sine => (clock * freq * TAU / sample_rate).sin(),
-                        Wave::Square { duty } => {
-                            if (clock * freq / sample_rate) % 1.0 >= duty / 2.0 {
-                                1.0
-                            } else {
-                                0.0
-                            }
-                        }
-                        Wave::Saw => (clock * freq / sample_rate) % 1.0,
-                    };
+                    let mut value = 0.0;
+                    for octave in 1..=1 {
+                        value += 1.0
+                            * match wave {
+                                Wave::Triangle => {
+                                    (clock * freq * TAU / sample_rate).sin().asin() * 2.0 / PI
+                                }
+                                Wave::Sine => (clock * freq * TAU / sample_rate).sin(),
+                                Wave::Square { duty } => {
+                                    if (clock * octave as f32 * freq / sample_rate) % 1.0
+                                        >= duty / 2.0
+                                    {
+                                        1.0
+                                    } else {
+                                        0.0
+                                    }
+                                }
+                                Wave::Saw => (clock * freq / sample_rate) % 1.0,
+                                Wave::Noise => gen_range(-1.0, 1.0) * 0.3,
+                            };
+                    }
 
                     for sample in samples {
                         *sample = value;
@@ -98,7 +111,7 @@ impl Program for AudioTest {
     }
 
     fn update(&mut self, screen: &mut Screen, input: &Input) {
-        let base_freq = 110.0; //A2
+        let base_freq = 110.0 / 2.0; //A2
         let twelth_root = 2.0f32.powf(1.0 / 12.0);
 
         let _ = self.commands.send(Command::Note(0.0, self.wave));
@@ -145,10 +158,11 @@ impl Program for AudioTest {
             }
         }
 
-        self.wave = Wave::Square {
-            duty: self.duty_timer.sin() * 0.4 + 0.5,
-        };
-        self.duty_timer += 3.0 / 24.0;
+        // self.wave = Wave::Square {
+        //     duty: self.duty_timer.sin() * 0.4 + 0.5,
+        // };
+        // self.duty_timer += 3.0 / 24.0;
+        self.wave = Wave::Square { duty: 0.5 };
 
         for y in 0..screen.height() {
             let lightness = (((screen.height() - y - 1) * 5) / screen.height()) as u16 + 1;

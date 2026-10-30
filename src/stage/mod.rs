@@ -1,19 +1,26 @@
 use std::println;
 
 use glam::{Vec2, Vec3, vec2};
-use miniquad::{EventHandler, RenderingBackend, window::{self, screen_size}};
+use miniquad::{
+    EventHandler, RenderingBackend,
+    window::{self, screen_size},
+};
 
-use crate::stage::{brains::Brains, input::Input, screen::{Scale, Screen}};
+use crate::stage::{
+    brains::Brains,
+    input::Input,
+    screen::{Scale, Screen},
+};
 
-pub mod screen;
-pub mod input;
 pub mod brains;
+pub mod input;
 pub mod programs;
+pub mod screen;
 
-pub const COLUMNS: u8 = 80+40;
-pub const ROWS:    u8 = 48+24;
+pub const COLUMNS: u8 = 120;
+pub const ROWS: u8 = 72;
 pub const U_COLUMNS: usize = COLUMNS as usize;
-pub const U_ROWS:    usize = ROWS    as usize;
+pub const U_ROWS: usize = ROWS as usize;
 
 pub type Ctx = Box<dyn RenderingBackend>;
 
@@ -44,25 +51,22 @@ impl EventHandler for Stage {
         self.input.end();
     }
 
-    fn key_down_event(&mut self, keycode: miniquad::KeyCode, _keymods: miniquad::KeyMods, repeat: bool) {
+    fn key_down_event(
+        &mut self,
+        keycode: miniquad::KeyCode,
+        _keymods: miniquad::KeyMods,
+        repeat: bool,
+    ) {
         self.input.key_down_event(keycode, repeat);
     }
     fn key_up_event(&mut self, keycode: miniquad::KeyCode, _keymods: miniquad::KeyMods) {
         self.input.key_up_event(keycode);
     }
 
-    fn mouse_enter_event(&mut self, _button: miniquad::MouseButton ,_x: f32, _y: f32 ) {
-
-    }
-    fn mouse_leave_event(&mut self) {
-
-    }
-    fn window_minimized_event(&mut self) {
-
-    }
-    fn window_restored_event(&mut self) {
-
-    }
+    fn mouse_enter_event(&mut self, _button: miniquad::MouseButton, _x: f32, _y: f32) {}
+    fn mouse_leave_event(&mut self) {}
+    fn window_minimized_event(&mut self) {}
+    fn window_restored_event(&mut self) {}
 
     fn char_event(&mut self, _character: char, _keymods: miniquad::KeyMods, _repeat: bool) {
         // TODO
@@ -70,7 +74,8 @@ impl EventHandler for Stage {
 
     fn mouse_motion_event(&mut self, x: f32, y: f32) {
         let (sw, sh) = screen_size();
-        self.input.mouse_move_event(&self.screen, vec2(x, y) / vec2(sw, sh));
+        self.input
+            .mouse_move_event(&self.screen, vec2(x, y) / vec2(sw, sh));
     }
 
     fn resize_event(&mut self, width: f32, height: f32) {
