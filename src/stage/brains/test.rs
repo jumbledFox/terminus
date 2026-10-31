@@ -87,6 +87,7 @@ impl Program for TestProgram {
                     1 => 14,
                     _ => 15,
                 };
+                let ch = 13;
                 let cell = Cell::new(ch, bg, 0, 0b00);
                 screen.draw_cell(x, y, cell);
             }
@@ -151,10 +152,25 @@ impl Program for TestProgram {
                 [_, _] => (col, 0, 2),
             };
             screen.draw_cell(m.cell().x, m.cell().y, Cell::new(ch, fg, bg, 0));
+            screen.draw_text(
+                m.cell().x as isize,
+                m.cell().y as isize - 1,
+                &format!("({:?}, {:?})", m.cell().x, m.cell().y),
+                fg,
+                bg,
+            );
         }
 
         let (cx, cy) = (self.pos.x as isize, self.pos.y as isize);
         screen.draw_rect(cx - 3, cy - 3, 7, 7, Cell::new(63, 0b000111000, 0, 0));
+        screen.draw_text(cx - 2, cy - 2, "Moving box..", 0, 0b000111000);
+        screen.draw_text(
+            cx - 2,
+            cy - 1,
+            &format!("({:?}, {:?})", self.pos.x as isize, self.pos.y as isize),
+            0,
+            0b000111000,
+        );
 
         let t = self.timer / 2.4;
         let (x1, y1, cell) = (
@@ -170,6 +186,7 @@ impl Program for TestProgram {
             10,
             Cell::new(63, 0b111000000, 0b000000010, 0),
         );
+        screen.draw_text(x1 - 5, y1 - 6, "AAAH", 0b111000000, 0b000000010);
         screen.draw_line(120 / 2, 72 / 2, x1, y1, cell);
 
         self.timer += 1.0 / 60.0 * 3.0;

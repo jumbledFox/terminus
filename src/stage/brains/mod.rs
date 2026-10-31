@@ -32,8 +32,8 @@ pub struct Brains {
 impl Brains {
     pub fn new() -> Self {
         Self {
-            program: Some(Box::new(TestProgram::new())),
-            // program: Some(Box::new(AudioTest::new())),
+            // program: Some(Box::new(TestProgram::new())),
+            program: Some(Box::new(AudioTest::new())),
             last_time: miniquad::date::now(),
             deltatime: 0.0,
             update_timer: 0.0,

@@ -73,10 +73,20 @@ impl Screen {
         self.cells[index] = cell;
     }
 
-    // pub fn draw_text(&mut self, x: isize, y: isize, text: &str, )
     // TODO: Think of some clever closure techniques for gradients in text.. ?
+    // also cleaner version without fg and bg.. ?
+    // i honestly think closures are the answer to these drawing functions
+    pub fn draw_text(&mut self, mut x: isize, y: isize, text: &str, fg: u16, bg: u16) {
+        for c in text.chars() {
+            let ch = Cell::char_to_index(c);
+            let cell = Cell::new(ch, fg, bg, 0);
+            self.plot_cell(x, y, cell);
+            x += 1;
+        }
+    }
 
     pub fn draw_line(&mut self, mut x0: isize, mut y0: isize, x1: isize, y1: isize, cell: Cell) {
+        // Faster implementations for perfectly horizontal/vertical lines
         if x0 == x1 {
             for y in y0.min(y1)..y0.max(y1) {
                 self.plot_cell(x0, y, cell);
