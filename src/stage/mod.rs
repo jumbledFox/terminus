@@ -14,7 +14,6 @@ use crate::stage::{
 
 pub mod brains;
 pub mod input;
-pub mod programs;
 pub mod screen;
 
 pub const COLUMNS: u8 = 120;
